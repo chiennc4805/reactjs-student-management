@@ -1,22 +1,17 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Col, notification, Popconfirm, Row, Space, Table, Tag } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Col, notification, Popconfirm, Row, Table, Tag } from 'antd';
 import { useState } from 'react';
-import StudentForm from './create.student.modal';
-import ViewStudentDetail from './view.student.drawer';
-import UpdateStudentModal from './update.student.modal';
-import { deleteStudentAPI } from '../../services/api.service';
-import dayjs from "dayjs";
+import { deleteClassAPI, deleteSubjectAPI } from '../../services/api.service';
+import UpdateClassModal from './update.class.modal';
 
 
-const StudentTable = (props) => {
+const ClassTable = (props) => {
 
     const [api, contextHolder] = notification.useNotification();
 
-    const { dataStudents, loadStudent, pageSize, setPageSize,
-        current, setCurrent, total } = props
+    const { dataClasses, loadClass, pageSize, setPageSize,
+        current, setCurrent, total, campusOptions, subjectOptions } = props
 
-    const [studentDetail, setStudentDetail] = useState(null)
-    const [isDetailOpen, setIsDetailOpen] = useState(false)
     const [dataUpdate, setDataUpdate] = useState(null)
     const [isUpdateFormOpen, setIsUpdateFormOpen] = useState(false)
 
@@ -27,11 +22,11 @@ const StudentTable = (props) => {
         });
     };
 
-    const handleDeleteStudent = async (id) => {
-        const res = await deleteStudentAPI(id)
+    const handleDeleteClass = async (id) => {
+        const res = await deleteClassAPI(id)
         if (res.data) {
-            openNotificationWithIcon('success', 'Thành công', 'Xoá học sinh thành công')
-            await loadStudent()
+            openNotificationWithIcon('success', 'Thành công', 'Xoá lớp học thành công')
+            await loadClass()
         } else {
             openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
         }
@@ -54,54 +49,51 @@ const StudentTable = (props) => {
             dataIndex: 'id',
             render: (_, record) => {
                 return (
-                    <a href='#'
-                        onClick={() => {
-                            setStudentDetail(record)
-                            setIsDetailOpen(true);
-                            console.log("record: ", record)
-                        }}
-                    >
-                        {record.id}
-                    </a>
-                )
-            }
-        },
-        {
-            title: 'Họ và tên',
-            dataIndex: 'name',
-        },
-        {
-            title: 'Giới tính',
-            dataIndex: 'gender',
-            render: (_, record) => {
-                return (
                     <span>
-                        {record.gender ? "Nam" : "Nữ"}
+                        {record.id}
                     </span>
                 )
             }
         },
         {
-            title: 'Ngày sinh',
-            dataIndex: 'birthDate',
-            render: (birthDate) => (
-                <span>
-                    {dayjs(birthDate).format("DD-MM-YYYY")}
-                </span>
+            title: 'Tên lớp học',
+            dataIndex: 'name',
+        },
+        {
+            title: 'Dạy môn',
+            dataIndex: 'subject',
+            render: (subject) => (
+                <Tag>
+                    {subject.name}
+                </Tag>
             )
         },
         {
-            title: 'Lớp học',
-            dataIndex: 'classes',
-            render: (classes) => (
-                <>
-                    {classes.map(c => {
-                        return (
-                            <Tag>{c.name}</Tag>
-                        );
-                    })}
-                </>
+            title: 'Giáo viên',
+            dataIndex: 'teacher',
+            render: (teacher) => (
+                <Tag>
+                    {teacher.name} - {teacher.telephone}
+                </Tag>
             )
+        },
+        {
+            title: 'Cơ sở',
+            dataIndex: 'campus',
+            render: (campus) => (
+                <Tag>
+                    {campus.name} - {campus.address}
+                </Tag>
+            )
+        },
+        {
+            title: 'Trạng thái',
+            //dataIndex: 'birthDate',
+            render: (_, record) => {
+                return (
+                    <Tag color="success">ACTIVE</Tag>
+                )
+            }
         },
         {
             title: 'Action',
@@ -115,9 +107,9 @@ const StudentTable = (props) => {
                         }} />
 
                     <Popconfirm
-                        title="Xoá học sinh"
-                        description="Bạn chắc chắn xoá học sinh này?"
-                        onConfirm={() => handleDeleteStudent(record.id)}
+                        title="Xoá lớp học"
+                        description="Bạn chắc chắn xoá lớp học này?"
+                        onConfirm={() => handleDeleteClass(record.id)}
                         okText="Có"
                         cancelText="Không"
                         placement='left'
@@ -156,7 +148,7 @@ const StudentTable = (props) => {
                     <Table
                         rowKey={"id"}
                         columns={columns}
-                        dataSource={dataStudents}
+                        dataSource={dataClasses}
                         bordered={true}
                         size='large'
                         pagination={
@@ -172,17 +164,14 @@ const StudentTable = (props) => {
                 </Col>
             </Row>
 
-            <ViewStudentDetail
-                isDetailOpen={isDetailOpen}
-                setIsDetailOpen={setIsDetailOpen}
-                studentDetail={studentDetail}
-            />
-            <UpdateStudentModal
-                loadStudent={loadStudent}
+            <UpdateClassModal
+                loadClass={loadClass}
                 isUpdateFormOpen={isUpdateFormOpen}
                 setIsUpdateFormOpen={setIsUpdateFormOpen}
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
+                campusOptions={campusOptions}
+                subjectOptions={subjectOptions}
             />
         </>
 
@@ -190,4 +179,4 @@ const StudentTable = (props) => {
 
 }
 
-export default StudentTable;
+export default ClassTable;

@@ -13,7 +13,7 @@ const StudentForm = (props) => {
 
     const [isFormOpen, setIsFormOpen] = useState(false)
 
-    const { loadStudent } = props
+    const { loadStudent, classOptions } = props
 
     const [form] = Form.useForm();
 
@@ -116,10 +116,8 @@ const StudentForm = (props) => {
                                     mode="multiple"
                                     placeholder="Chọn lớp học"
                                     allowClear={true}
+                                    options={classOptions}
                                 >
-                                    <Option value="red">Red</Option>
-                                    <Option value="green">Green</Option>
-                                    <Option value="blue">Blue</Option>
                                 </Select>
                             </Form.Item>
                         </Col>

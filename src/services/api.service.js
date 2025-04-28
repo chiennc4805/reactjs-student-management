@@ -80,6 +80,11 @@ const fetchParentById = () => {
 }
 
 //module campus api
+const fetchAllCampusWithoutPaginationAPI = () => {
+    const URL_BACKEND = `/campus`
+    return axios.get(URL_BACKEND)
+}
+
 const fetchAllCampusAPI = (page, pageSize) => {
     const URL_BACKEND = `/campus?page=${page}&size=${pageSize}`
     return axios.get(URL_BACKEND)
@@ -188,11 +193,52 @@ const deleteTeacherAPI = (id) => {
     return axios.delete(URL_BACKEND)
 }
 
+//module class api
+const fetchAllClassesWithoutPaginationAPI = () => {
+    const URL_BACKEND = `/classes`
+    return axios.get(URL_BACKEND)
+}
+
+const fetchAllClassesAPI = (page, pageSize) => {
+    const URL_BACKEND = `/classes?page=${page}&size=${pageSize}`
+    return axios.get(URL_BACKEND)
+}
+
+const createClassAPI = (name, subject, teacher, campus) => {
+    const URL_BACKEND = "/classes"
+    const data = {
+        name: name,
+        subject: subject,
+        teacher: teacher,
+        campus: campus
+    }
+    return axios.post(URL_BACKEND, data)
+}
+
+const updateClassAPI = (id, name, subject, teacher, campus) => {
+    const URL_BACKEND = "/classes"
+    const data = {
+        id: id,
+        name: name,
+        subject: subject,
+        teacher: teacher,
+        campus: campus
+    }
+    return axios.put(URL_BACKEND, data)
+}
+
+const deleteClassAPI = (id) => {
+    const URL_BACKEND = `/classes/${id}`
+    return axios.delete(URL_BACKEND)
+}
+
+
 export {
     fetchAllStudentsAPI, createStudentAPI, updateStudentAPI, deleteStudentAPI,
     fetchAllParentsAPI, createParentAPI, updateParentAPI, deleteParentAPI,
-    fetchAllCampusAPI, createCampusAPI, updateCampusAPI, deleteCampusAPI,
+    fetchAllCampusAPI, createCampusAPI, updateCampusAPI, deleteCampusAPI, fetchAllCampusWithoutPaginationAPI,
     fetchAllSubjectsAPI, createSubjectAPI, updateSubjectAPI, deleteSubjectAPI, fetchAllSubjectsWithoutPaginationAPI,
     fetchAllTeachersAPI, createTeacherAPI, updateTeacherAPI, deleteTeacherAPI,
+    fetchAllClassesAPI, createClassAPI, updateClassAPI, deleteClassAPI, fetchAllClassesWithoutPaginationAPI,
 
 }
