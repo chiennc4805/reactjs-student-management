@@ -64,41 +64,47 @@ function App() {
 					</div>
 					<Menu
 						mode="inline"
-						defaultSelectedKeys={['1']}
 						items={[
 							{
+								key: "1",
 								label: <Link to="/students">Học sinh</Link>,
 								icon: <UserOutlined />
 							},
 							{
+								key: "2",
 								label: <Link to="/parents">Phụ huynh</Link>,
 								icon: <UserOutlined />
 							},
 							{
+								key: "3",
 								label: <Link to="/teachers">Giáo viên</Link>,
 								icon: <UserOutlined />
 							},
 							{
+								key: "4",
 								label: <Link to="/classes">Lớp học</Link>,
 								icon: <TeamOutlined />
 							},
 							{
+								key: "5",
 								label: <Link to="/subjects">Môn học</Link>,
 								icon: <ReadOutlined />
 							},
 							{
+								key: "6",
 								label: <Link to="/schedules">Lịch học</Link>,
 								icon: <ScheduleOutlined />
 							},
 							{
+								key: "7",
 								label: "Cơ sở",
 								icon: <HomeOutlined />,
 								children: [
 									{
-										label: <Link to="/campus">Thông tin</Link>,
+										label: <Link to="/campus">Thông tin</Link>
 									},
 									{
-										label: <Link to="/facilities">Thiết bị</Link>,
+										label: <Link to="/facilities">Thiết bị</Link>
 									},
 								]
 							},
