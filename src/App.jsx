@@ -1,21 +1,19 @@
-import { useState } from 'react'
-import SideBar from './components/layout/sidebar'
-import { Link, Outlet } from 'react-router-dom'
 import {
 	BugOutlined,
-	DownOutlined,
 	HomeOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
 	ReadOutlined,
 	ScheduleOutlined,
 	TeamOutlined,
-	UserOutlined,
-	VideoCameraOutlined,
+	UserOutlined
 } from '@ant-design/icons';
-import { Avatar, Button, Dropdown, Layout, Menu, Space, theme } from 'antd';
-import React from 'react';
+import { Avatar, Button, Dropdown, Layout, Menu, message, theme } from 'antd';
+import React, { useContext, useEffect, useState } from 'react';
+import { Link, Outlet } from 'react-router-dom';
+import { AuthContext } from './components/context/auth.context';
 import SearchBar from './components/layout/search.bar';
+import { getAccountAPI, logoutAPI } from './services/api.service';
 
 
 function App() {
@@ -25,6 +23,37 @@ function App() {
 	const {
 		token: { colorBgContainer, borderRadiusLG },
 	} = theme.useToken();
+
+	const { user, setUser } = useContext(AuthContext)
+
+	useEffect(() => {
+		fetchUserInfo()
+	}, [])
+
+	const fetchUserInfo = async () => {
+		const res = await getAccountAPI()
+		if (res.data) {
+			//success
+			setUser(res.data.user)
+		}
+	}
+
+	const handleLogout = async () => {
+		const res = await logoutAPI()
+		if (res.data) {
+			//clear data
+			localStorage.removeItem("access_token")
+			setUser({
+				id: "",
+				name: "",
+				role: ""
+			})
+			message.success("Đăng xuất thành công.")
+
+			//redirect to home
+			navigate("/")
+		}
+	}
 
 	const siderStyle = {
 		height: '100vh',
@@ -50,7 +79,7 @@ function App() {
 			type: 'divider',
 		},
 		{
-			label: '3rd menu item',
+			label: <a onClick={handleLogout}>Đăng xuất</a>,
 			key: '3',
 		},
 	];
@@ -128,14 +157,20 @@ function App() {
 								height: 64,
 							}}
 						/>
-						<Dropdown menu={{ items }} trigger={['click']}>
-							<div
-								onClick={e => e.preventDefault()}
-								style={{ margin: "0px 10px", cursor: "pointer" }}>
-								Welcome
-								<Avatar size="middle" icon={<UserOutlined />} style={{ margin: "0px 15px" }} />
-							</div>
-						</Dropdown>
+						{user && user.id ?
+							<Dropdown menu={{ items }} trigger={['click']}>
+								<div
+									onClick={e => e.preventDefault()}
+									style={{ margin: "0px 10px", cursor: "pointer" }}>
+									Welcome {user.name}
+									<Avatar size="middle" icon={<UserOutlined />} style={{ margin: "0px 15px" }} />
+								</div>
+							</Dropdown>
+							:
+							<>
+								<Link to="/login" style={{ margin: "0px 50px" }}>Đăng nhập</Link>
+							</>
+						}
 					</Header>
 
 					<Content style={{ margin: '24px 16px', overflow: 'initial' }}>

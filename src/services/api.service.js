@@ -232,13 +232,29 @@ const deleteClassAPI = (id) => {
     return axios.delete(URL_BACKEND)
 }
 
+//module auth api
+const loginAPI = (email, password) => {
+    const URL_BACKEND = "/auth/login"
+    const data = {
+        username: email,
+        password: password,
+    }
+    return axios.post(URL_BACKEND, data)
+}
+
+const getAccountAPI = () => {
+    const URL_BACKEND = "/auth/account"
+    return axios.get(URL_BACKEND)
+}
+
+const logoutAPI = () => {
+    const URL_BACKEND = "/auth/logout"
+    return axios.post(URL_BACKEND)
+}
+
 
 export {
-    fetchAllStudentsAPI, createStudentAPI, updateStudentAPI, deleteStudentAPI,
-    fetchAllParentsAPI, createParentAPI, updateParentAPI, deleteParentAPI,
-    fetchAllCampusAPI, createCampusAPI, updateCampusAPI, deleteCampusAPI, fetchAllCampusWithoutPaginationAPI,
-    fetchAllSubjectsAPI, createSubjectAPI, updateSubjectAPI, deleteSubjectAPI, fetchAllSubjectsWithoutPaginationAPI,
-    fetchAllTeachersAPI, createTeacherAPI, updateTeacherAPI, deleteTeacherAPI,
-    fetchAllClassesAPI, createClassAPI, updateClassAPI, deleteClassAPI, fetchAllClassesWithoutPaginationAPI,
+    createCampusAPI, createClassAPI, createParentAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI,
+    fetchAllTeachersAPI, getAccountAPI, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateStudentAPI, updateSubjectAPI, updateTeacherAPI
+};
 
-}

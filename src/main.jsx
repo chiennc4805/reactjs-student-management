@@ -1,21 +1,21 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
+import { createRoot } from 'react-dom/client';
 import {
 	createBrowserRouter,
 	RouterProvider,
-} from "react-router-dom"
-import StudentPage from './pages/student.jsx';
-import './styles/global.css'
-import Welcome from './pages/welcome.jsx';
-import SchedulePage from './pages/schedule.jsx';
-import ParentPage from './pages/parent.jsx';
-import CampusPage from './pages/campus.jsx';
-import FacilityPage from './pages/facility.jsx';
+} from "react-router-dom";
+import App from './App.jsx';
 import { AuthWrapper } from './components/context/auth.context.jsx';
+import CampusPage from './pages/campus.jsx';
 import ClassPage from './pages/class.jsx';
+import FacilityPage from './pages/facility.jsx';
+import LoginPage from './pages/login.jsx';
+import ParentPage from './pages/parent.jsx';
+import SchedulePage from './pages/schedule.jsx';
+import StudentPage from './pages/student.jsx';
 import SubjectPage from './pages/subject.jsx';
 import TeacherPage from './pages/teacher.jsx';
+import Welcome from './pages/welcome.jsx';
+import './styles/global.css';
 
 const router = createBrowserRouter([
 	{
@@ -59,6 +59,10 @@ const router = createBrowserRouter([
 				element: <TeacherPage />
 			},
 		]
+	},
+	{
+		path: "/login",
+		element: <LoginPage />
 	},
 ]);
 
