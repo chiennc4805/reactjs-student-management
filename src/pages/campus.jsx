@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { fetchAllCampusAPI } from "../services/api.service";
-import CampusForm from "../components/campus/create.campus.modal";
 import CampusTable from "../components/campus/campus.table";
+import CampusForm from "../components/campus/create.campus.modal";
+import { fetchAllCampusAPI } from "../services/api.service";
 
 const CampusPage = () => {
 
@@ -18,7 +18,7 @@ const CampusPage = () => {
     const loadCampus = async () => {
         const res = await fetchAllCampusAPI(current, pageSize)
         if (res.data) {
-            if (res.data.result.length === 0) {
+            if (res.data.result.length === 0 && current > 1) {
                 setCurrent(res.data.meta.page - 1)
             } else {
                 setCurrent(res.data.meta.page)

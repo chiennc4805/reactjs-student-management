@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { fetchAllCampusWithoutPaginationAPI, fetchAllClassesAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI } from "../services/api.service";
-import ClassForm from "../components/class/create.class.modal";
 import ClassTable from "../components/class/class.table";
+import ClassForm from "../components/class/create.class.modal";
+import { fetchAllCampusWithoutPaginationAPI, fetchAllClassesAPI, fetchAllSubjectsWithoutPaginationAPI } from "../services/api.service";
 
 const ClassPage = () => {
 

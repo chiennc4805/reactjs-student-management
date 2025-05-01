@@ -1,6 +1,8 @@
-import { Col, Form, Input, InputNumber, Modal, notification, Row, Select } from "antd";
+import { Col, DatePicker, Form, Input, Modal, notification, Row, Select } from "antd";
+import dayjs from "dayjs";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useEffect } from "react";
-import { updateClassAPI, updateSubjectAPI } from "../../services/api.service";
+import { updateClassAPI } from "../../services/api.service";
 
 
 const UpdateClassModal = (props) => {
@@ -12,10 +14,15 @@ const UpdateClassModal = (props) => {
 
     useEffect(() => {
         if (dataUpdate) {
+            form.setFieldValue("id", dataUpdate.id)
             form.setFieldValue("name", dataUpdate.name)
             form.setFieldValue("teacher", dataUpdate.teacher.telephone)
             form.setFieldValue("subject", dataUpdate.subject.id)
             form.setFieldValue("campus", dataUpdate.campus.id)
+
+            const openDay = dayjs(dataUpdate.openDay)
+
+            form.setFieldValue("openDay", openDay)
         }
     }, [dataUpdate])
 
@@ -27,12 +34,14 @@ const UpdateClassModal = (props) => {
     };
 
     const onFinish = async (values) => {
-
         const subject = { id: values.subject }
         const teacher = { telephone: values.teacher }
         const campus = { id: values.campus }
 
-        const res = await updateClassAPI(values.id, values.name, subject, teacher, campus)
+        dayjs.extend(customParseFormat)
+        const openDay = dayjs(values.openDay).format('YYYY-MM-DD')
+
+        const res = await updateClassAPI(values.id, values.name, subject, teacher, campus, openDay)
         if (res.data) {
             openNotificationWithIcon('success', 'Thành công', 'Cập nhật lớp học thành công')
             await loadClass()
@@ -136,8 +145,17 @@ const UpdateClassModal = (props) => {
                                     allowClear={true}
                                     options={campusOptions}
                                 >
-
                                 </Select>
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
+                            <Form.Item style={{ width: "48%" }}
+                                label="Ngày khai giảng"
+                                name="openDay"
+                                rules={[{ required: true, message: 'Vui lòng chọn ngày khai giảng !' }]}
+                            >
+                                <DatePicker picker="date" format={"DD/MM/YYYY"} placeholder="DD/MM/YYYY" />
                             </Form.Item>
                         </Col>
                     </Row>

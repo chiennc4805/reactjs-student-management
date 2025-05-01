@@ -204,25 +204,27 @@ const fetchAllClassesAPI = (page, pageSize) => {
     return axios.get(URL_BACKEND)
 }
 
-const createClassAPI = (name, subject, teacher, campus) => {
+const createClassAPI = (name, subject, teacher, campus, openDay) => {
     const URL_BACKEND = "/classes"
     const data = {
         name: name,
         subject: subject,
         teacher: teacher,
-        campus: campus
+        campus: campus,
+        openDay: openDay
     }
     return axios.post(URL_BACKEND, data)
 }
 
-const updateClassAPI = (id, name, subject, teacher, campus) => {
+const updateClassAPI = (id, name, subject, teacher, campus, openDay) => {
     const URL_BACKEND = "/classes"
     const data = {
         id: id,
         name: name,
         subject: subject,
         teacher: teacher,
-        campus: campus
+        campus: campus,
+        openDay: openDay
     }
     return axios.put(URL_BACKEND, data)
 }
@@ -252,9 +254,43 @@ const logoutAPI = () => {
     return axios.post(URL_BACKEND)
 }
 
+//module schedule api
+const fetchScheduleInWeek = (startDate) => {
+    const URL_BACKEND = `/schedule?startDate=${startDate}`
+    return axios.get(URL_BACKEND)
+}
+
+const createScheduleAPI = (classInfo, slotNumber, weekdayList) => {
+    const URL_BACKEND = "/schedule"
+    const data = {
+        classInfo: classInfo,
+        slotNumber: slotNumber,
+        weekdayList: weekdayList
+    }
+    return axios.post(URL_BACKEND, data)
+}
+
+const updateScheduleAPI = (id, name, subject, teacher, campus, openDay) => {
+    const URL_BACKEND = "/schedule"
+    const data = {
+        id: id,
+        name: name,
+        subject: subject,
+        teacher: teacher,
+        campus: campus,
+        openDay: openDay
+    }
+    return axios.put(URL_BACKEND, data)
+}
+
+const deleteScheduleAPI = (id) => {
+    const URL_BACKEND = `/schedule/${id}`
+    return axios.delete(URL_BACKEND)
+}
+
 
 export {
-    createCampusAPI, createClassAPI, createParentAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI,
-    fetchAllTeachersAPI, getAccountAPI, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateStudentAPI, updateSubjectAPI, updateTeacherAPI
+    createCampusAPI, createClassAPI, createParentAPI, createScheduleAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteScheduleAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI,
+    fetchAllTeachersAPI, fetchScheduleInWeek, getAccountAPI, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateScheduleAPI, updateStudentAPI, updateSubjectAPI, updateTeacherAPI
 };
 

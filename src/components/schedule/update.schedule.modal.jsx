@@ -1,17 +1,26 @@
-import { PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, InputNumber, Modal, notification, Row } from "antd";
-import { useState } from "react";
-import { createSubjectAPI } from "../../services/api.service";
+import { Col, DatePicker, Form, Input, InputNumber, Modal, notification, Row, Select } from "antd";
+import locale from 'antd/es/date-picker/locale/vi_VN'
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { updateStudentAPI, updateSubjectAPI } from "../../services/api.service";
 
-const SubjectForm = (props) => {
+
+const UpdateSubjectModal = (props) => {
 
     const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
+    const [form] = Form.useForm()
 
-    const [isFormOpen, setIsFormOpen] = useState(false)
+    const { isUpdateFormOpen, setIsUpdateFormOpen, loadSubject, setDataUpdate, dataUpdate } = props
 
-    const { loadSubject } = props
-
-    const [form] = Form.useForm();
+    useEffect(() => {
+        if (dataUpdate) {
+            form.setFieldValue("id", dataUpdate.id)
+            form.setFieldValue("name", dataUpdate.name)
+            form.setFieldValue("pricePerDay", dataUpdate.pricePerDay)
+            form.setFieldValue("salaryPerDay", dataUpdate.salaryPerDay)
+        }
+    }, [dataUpdate])
 
     const openNotificationWithIcon = (type, message, description) => {
         api[type]({
@@ -21,17 +30,21 @@ const SubjectForm = (props) => {
     };
 
     const onFinish = async (values) => {
-        const res = await createSubjectAPI(values.name, values.pricePerDay, values.salaryPerDay)
+
+        const res = await updateSubjectAPI(values.id, values.name, values.pricePerDay, values.salaryPerDay)
         if (res.data) {
-            openNotificationWithIcon('success', 'Thành công', 'Thêm mới môn học thành công')
+            openNotificationWithIcon('success', 'Thành công', 'Cập nhật môn học thành công')
             await loadSubject()
-            setIsFormOpen(false)
-            form.resetFields()
+            reloadAndCloseModal()
         } else {
             openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
         }
-
     };
+
+    const reloadAndCloseModal = () => {
+        setIsUpdateFormOpen(false)
+        setDataUpdate(null)
+    }
 
     const formatterNumber = (val) => {
         if (!val) return "0";
@@ -42,29 +55,12 @@ const SubjectForm = (props) => {
         <>
             {contextHolder}
 
-            <div xs={24} style={{ display: "flex", justifyContent: "space-between", margin: "1%" }}>
-                <h3>
-                    Danh sách môn học
-                </h3>
-
-                <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={() => setIsFormOpen(true)}
-                >
-                    Thêm mới
-                </Button>
-            </div>
-
             <Modal
-                title="Thêm mới môn học" open={isFormOpen}
+                title="Cập nhật môn học"
+                open={isUpdateFormOpen}
                 onOk={() => form.submit()}
-                onCancel={() => {
-                    setIsFormOpen(false);
-                    form.resetFields()
-                }
-                }
-                okText="Thêm mới"
+                onCancel={() => reloadAndCloseModal()}
+                okText="Cập nhật"
                 cancelText="Huỷ"
                 footer={(_, { OkBtn, CancelBtn }) => (
                     <>
@@ -90,6 +86,14 @@ const SubjectForm = (props) => {
                     <Row justify={"center"} style={{ marginTop: "20px" }}>
 
                         <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
+
+                            <Form.Item
+                                style={{ display: "none" }}
+                                name="id"
+                            >
+                                <Input type="hidden" />
+                            </Form.Item>
+
                             <Form.Item style={{ width: "40%" }}
                                 label="Tên môn học"
                                 name="name"
@@ -132,4 +136,4 @@ const SubjectForm = (props) => {
     )
 }
 
-export default SubjectForm;
+export default UpdateSubjectModal;

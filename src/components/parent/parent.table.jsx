@@ -1,10 +1,9 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Col, notification, Popconfirm, Row, Space, Table, Tag } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Col, notification, Popconfirm, Row, Table } from 'antd';
 import { useState } from 'react';
-import ParentForm from './create.parent.modal';
-import ViewParentDetail from './view.parent.drawer';
-import UpdateParentModal from './update.parent.modal';
 import { deleteParentAPI } from '../../services/api.service';
+import UpdateParentModal from './update.parent.modal';
+import ViewParentDetail from './view.parent.drawer';
 
 
 const ParentTable = (props) => {
@@ -57,7 +56,6 @@ const ParentTable = (props) => {
                         onClick={() => {
                             setParentDetail(record)
                             setIsDetailOpen(true);
-                            console.log("record: ", record)
                         }}
                     >
                         {record.id}

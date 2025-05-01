@@ -1,7 +1,7 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Col, notification, Popconfirm, Row, Table, Tag } from 'antd';
 import { useState } from 'react';
-import { deleteClassAPI, deleteSubjectAPI } from '../../services/api.service';
+import { deleteClassAPI } from '../../services/api.service';
 import UpdateClassModal from './update.class.modal';
 
 
@@ -87,8 +87,11 @@ const ClassTable = (props) => {
             )
         },
         {
+            title: 'Ngày khai giảng',
+            dataIndex: 'openDay',
+        },
+        {
             title: 'Trạng thái',
-            //dataIndex: 'birthDate',
             render: (_, record) => {
                 return (
                     <Tag color="success">ACTIVE</Tag>

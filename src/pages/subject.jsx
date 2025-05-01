@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import StudentTable from "../components/student/student.table";
-import { fetchAllStudentsAPI, fetchAllSubjectsAPI } from "../services/api.service";
-import { notification } from "antd";
-import StudentForm from "../components/student/create.student.modal";
 import SubjectForm from "../components/subject/create.subject.modal";
 import SubjectTable from "../components/subject/subject.table";
+import { fetchAllSubjectsAPI } from "../services/api.service";
 
 const SubjectPage = () => {
 
@@ -21,7 +18,7 @@ const SubjectPage = () => {
     const loadSubject = async () => {
         const res = await fetchAllSubjectsAPI(current, pageSize)
         if (res.data) {
-            if (res.data.result.length === 0) {
+            if (res.data.result.length === 0 && current > 1) {
                 setCurrent(res.data.meta.page - 1)
             } else {
                 setCurrent(res.data.meta.page)

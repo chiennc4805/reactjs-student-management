@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
+import StudentForm from "../components/student/create.student.modal";
 import StudentTable from "../components/student/student.table";
 import { fetchAllClassesWithoutPaginationAPI, fetchAllStudentsAPI } from "../services/api.service";
-import { notification } from "antd";
-import StudentForm from "../components/student/create.student.modal";
 
 const StudentPage = () => {
 
@@ -27,9 +26,8 @@ const StudentPage = () => {
 
     const loadStudent = async () => {
         const res = await fetchAllStudentsAPI(current, pageSize)
-        console.log(res)
         if (res.data) {
-            if (res.data.result.length === 0) {
+            if (res.data.result.length === 0 && current > 1) {
                 setCurrent(res.data.meta.page - 1)
             } else {
                 setCurrent(res.data.meta.page)

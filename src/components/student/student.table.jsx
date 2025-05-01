@@ -1,11 +1,10 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Col, notification, Popconfirm, Row, Space, Table, Tag } from 'antd';
-import { useState } from 'react';
-import StudentForm from './create.student.modal';
-import ViewStudentDetail from './view.student.drawer';
-import UpdateStudentModal from './update.student.modal';
-import { deleteStudentAPI } from '../../services/api.service';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Col, notification, Popconfirm, Row, Table, Tag } from 'antd';
 import dayjs from "dayjs";
+import { useState } from 'react';
+import { deleteStudentAPI } from '../../services/api.service';
+import UpdateStudentModal from './update.student.modal';
+import ViewStudentDetail from './view.student.drawer';
 
 
 const StudentTable = (props) => {
@@ -58,7 +57,6 @@ const StudentTable = (props) => {
                         onClick={() => {
                             setStudentDetail(record)
                             setIsDetailOpen(true);
-                            console.log("record: ", record)
                         }}
                     >
                         {record.id}

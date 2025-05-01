@@ -1,10 +1,7 @@
-import { Modal, Button, Form, Input, Row, Col, DatePicker, Select, notification } from "antd";
-import locale from 'antd/es/date-picker/locale/vi_VN'
-import dayjs from "dayjs";
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { createCampusAPI, createStudentAPI } from "../../services/api.service";
 import { PlusOutlined } from "@ant-design/icons";
+import { Button, Col, Form, Input, Modal, Row, notification } from "antd";
 import { useState } from "react";
+import { createCampusAPI } from "../../services/api.service";
 
 const CampusForm = (props) => {
 
@@ -39,7 +36,7 @@ const CampusForm = (props) => {
         <>
             {contextHolder}
 
-            <div xs={24} style={{ display: "flex", justifyContent: "space-between", margin: "20px 0px" }}>
+            <div xs={24} style={{ display: "flex", justifyContent: "space-between", margin: "1%" }}>
                 <h3>
                     Danh sách cơ sở
                 </h3>

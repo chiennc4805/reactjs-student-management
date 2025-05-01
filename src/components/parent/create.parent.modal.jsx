@@ -1,10 +1,10 @@
-import { Modal, Button, Form, Input, Row, Col, DatePicker, Select, notification } from "antd";
-import locale from 'antd/es/date-picker/locale/vi_VN'
-import { createParentAPI } from "../../services/api.service";
 import { PlusOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { Button, Col, DatePicker, Form, Input, Modal, Row, Select, notification } from "antd";
+import locale from 'antd/es/date-picker/locale/vi_VN';
 import dayjs from "dayjs";
-import customParseFormat from 'dayjs/plugin/customParseFormat'
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useState } from "react";
+import { createParentAPI } from "../../services/api.service";
 
 const ParentForm = (props) => {
 
@@ -44,7 +44,7 @@ const ParentForm = (props) => {
         <>
             {contextHolder}
 
-            <div xs={24} style={{ display: "flex", justifyContent: "space-between", margin: "20px 0px" }}>
+            <div xs={24} style={{ display: "flex", justifyContent: "space-between", margin: "1%" }}>
                 <h3>
                     Danh sách phụ huynh
                 </h3>

@@ -2,8 +2,8 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Col, notification, Popconfirm, Row, Table } from 'antd';
 import { useState } from 'react';
 import { deleteCampusAPI } from '../../services/api.service';
-import ViewCampusDetail from './view.campus.drawer';
 import UpdateCampusModal from './update.campus.modal';
+import ViewCampusDetail from './view.campus.drawer';
 
 
 const CampusTable = (props) => {
@@ -56,7 +56,6 @@ const CampusTable = (props) => {
                         onClick={() => {
                             setCampusDetail(record)
                             setIsDetailOpen(true);
-                            console.log("record: ", record)
                         }}
                     >
                         {record.id}

@@ -1,8 +1,8 @@
 
 import { useEffect, useState } from "react";
-import { fetchAllSubjectsWithoutPaginationAPI, fetchAllTeachersAPI } from "../services/api.service";
 import TeacherForm from "../components/teacher/create.teacher.modal";
 import TeacherTable from "../components/teacher/teacher.table";
+import { fetchAllSubjectsWithoutPaginationAPI, fetchAllTeachersAPI } from "../services/api.service";
 
 const TeacherPage = () => {
 
@@ -31,7 +31,7 @@ const TeacherPage = () => {
     const loadTeacher = async () => {
         const res = await fetchAllTeachersAPI(current, pageSize)
         if (res.data) {
-            if (res.data.result.length === 0) {
+            if (res.data.result.length === 0 && current > 1) {
                 setCurrent(res.data.meta.page - 1)
             } else {
                 setCurrent(res.data.meta.page)

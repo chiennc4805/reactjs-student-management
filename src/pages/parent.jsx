@@ -20,7 +20,7 @@ const ParentPage = () => {
     const loadParent = async () => {
         const res = await fetchAllParentsAPI(current, pageSize)
         if (res.data) {
-            if (res.data.result.length === 0) {
+            if (res.data.result.length === 0 && current > 1) {
                 setCurrent(res.data.meta.page - 1)
             } else {
                 setCurrent(res.data.meta.page)

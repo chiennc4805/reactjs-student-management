@@ -1,10 +1,10 @@
-import { Modal, Button, Form, Input, Row, Col, notification, Select, DatePicker } from "antd";
-import { createTeacherAPI, fetchAllSubjectsWithoutPaginationAPI } from "../../services/api.service";
 import { PlusOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { Button, Col, DatePicker, Form, Input, Modal, notification, Row, Select } from "antd";
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import dayjs from "dayjs";
-import customParseFormat from 'dayjs/plugin/customParseFormat'
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useState } from "react";
+import { createTeacherAPI } from "../../services/api.service";
 
 
 const TeacherForm = (props) => {
@@ -48,7 +48,7 @@ const TeacherForm = (props) => {
         <>
             {contextHolder}
 
-            <div xs={24} style={{ display: "flex", justifyContent: "space-between", margin: "20px 0px" }}>
+            <div xs={24} style={{ display: "flex", justifyContent: "space-between", margin: "1%" }}>
                 <h3>
                     Danh sách giáo viên
                 </h3>

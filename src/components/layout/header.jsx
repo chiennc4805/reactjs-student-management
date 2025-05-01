@@ -1,4 +1,4 @@
-import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
+import { SettingOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { useState } from 'react';
 
@@ -41,7 +41,6 @@ const Header = () => {
 
     const [current, setCurrent] = useState('mail');
     const onClick = e => {
-        console.log('click ', e);
         setCurrent(e.key);
     };
     return (

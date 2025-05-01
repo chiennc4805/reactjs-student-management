@@ -1,11 +1,10 @@
-import { Modal, Button, Form, Input, Row, Col, DatePicker, Select, notification } from "antd";
-import locale from 'antd/es/date-picker/locale/vi_VN'
-import vi_VN from 'antd/locale/vi_VN';
-import dayjs from "dayjs";
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { createStudentAPI } from "../../services/api.service";
 import { PlusOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { Button, Col, DatePicker, Form, Input, Modal, Row, Select, notification } from "antd";
+import locale from 'antd/es/date-picker/locale/vi_VN';
+import dayjs from "dayjs";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useState } from "react";
+import { createStudentAPI } from "../../services/api.service";
 
 const StudentForm = (props) => {
 
@@ -48,7 +47,7 @@ const StudentForm = (props) => {
         <>
             {contextHolder}
 
-            <div xs={24} style={{ display: "flex", justifyContent: "space-between", margin: "20px 0px" }}>
+            <div xs={24} style={{ display: "flex", justifyContent: "space-between", margin: "1%" }}>
                 <h3>
                     Danh sách học sinh
                 </h3>
@@ -111,6 +110,7 @@ const StudentForm = (props) => {
                             <Form.Item style={{ width: "48%" }}
                                 name="class"
                                 label="Lớp học"
+                                rules={[{ required: true, message: 'Vui lòng nhập họ và tên!' }]}
                             >
                                 <Select
                                     mode="multiple"

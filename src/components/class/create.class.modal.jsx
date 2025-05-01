@@ -1,7 +1,9 @@
-import { Modal, Button, Form, Input, Row, Col, notification, InputNumber, Select } from "antd";
-import { createClassAPI, createStudentAPI, createSubjectAPI } from "../../services/api.service";
 import { PlusOutlined } from "@ant-design/icons";
+import { Button, Col, DatePicker, Form, Input, Modal, notification, Row, Select } from "antd";
+import dayjs from "dayjs";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useState } from "react";
+import { createClassAPI } from "../../services/api.service";
 
 const ClassForm = (props) => {
 
@@ -25,7 +27,10 @@ const ClassForm = (props) => {
         const teacher = { telephone: values.teacher }
         const campus = { id: values.campus }
 
-        const res = await createClassAPI(values.name, subject, teacher, campus)
+        dayjs.extend(customParseFormat)
+        const openDay = dayjs(values.openDay).format('YYYY-MM-DD')
+
+        const res = await createClassAPI(values.name, subject, teacher, campus, openDay)
         if (res.data) {
             openNotificationWithIcon('success', 'Thành công', 'Thêm mới lớp học thành công')
             await loadClass()
@@ -37,16 +42,11 @@ const ClassForm = (props) => {
 
     };
 
-    const formatterNumber = (val) => {
-        if (!val) return "0";
-        return Number(val).toLocaleString("en-US");
-    };
-
     return (
         <>
             {contextHolder}
 
-            <div xs={24} style={{ display: "flex", justifyContent: "space-between", margin: "20px 0px" }}>
+            <div xs={24} style={{ display: "flex", justifyContent: "space-between", margin: "1%" }}>
                 <h3>
                     Danh sách lớp học
                 </h3>
@@ -138,6 +138,16 @@ const ClassForm = (props) => {
                                 >
 
                                 </Select>
+                            </Form.Item>
+                        </Col>
+
+                        <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
+                            <Form.Item style={{ width: "48%" }}
+                                label="Ngày khai giảng"
+                                name="openDay"
+                                rules={[{ required: true, message: 'Vui lòng chọn ngày khai giảng !' }]}
+                            >
+                                <DatePicker picker="date" format={"DD/MM/YYYY"} placeholder="DD/MM/YYYY" />
                             </Form.Item>
                         </Col>
 
