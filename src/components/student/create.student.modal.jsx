@@ -31,8 +31,9 @@ const StudentForm = (props) => {
         dayjs.extend(customParseFormat)
         const birthDate = dayjs(values.birthDate).format('YYYY-MM-DD')
         const gender = values.gender === "1" ? true : false
+        const classes = values.class.map(x => ({ id: x }))
 
-        const res = await createStudentAPI(values.name, gender, birthDate)
+        const res = await createStudentAPI(values.name, gender, birthDate, classes)
         if (res.data) {
             openNotificationWithIcon('success', 'Thành công', 'Thêm mới học sinh thành công')
             await loadStudent()
@@ -117,6 +118,10 @@ const StudentForm = (props) => {
                                     placeholder="Chọn lớp học"
                                     allowClear={true}
                                     options={classOptions}
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                    }
                                 >
                                 </Select>
                             </Form.Item>

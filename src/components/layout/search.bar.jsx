@@ -1,42 +1,36 @@
 // SearchBar.jsx - Reusable search component
-import { useState, useEffect } from 'react';
-import { Input, Button, Space, Form, Row, Col } from 'antd';
+import { Button, Form, Input, Space } from 'antd';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const SearchBar = () => {
+const SearchBar = (props) => {
     const location = useLocation();
 
     const [form] = Form.useForm();
 
-    const [searchConfig, setSearchConfig] = useState({
-        field1: { label: 'Name', placeholder: 'nhập dữ liệu' },
-        field2: { label: 'Address', placeholder: 'nhập dữ liệu' },
-    });
+    const { searchConfig, setSearchConfig } = props
 
-    // Update search fields based on current route
     useEffect(() => {
-        // Configure fields based on current path
-        const path = location.pathname;
 
-        if (path.includes('/students')) {
+        if (location.pathname.includes('/students')) {
             setSearchConfig({
-                field1: { label: 'Họ và tên', placeholder: 'nhập tên học sinh' },
-                field2: { label: 'Class', placeholder: 'nhập lớp' },
+                field1: { label: 'Họ và tên', name: 'name', placeholder: 'nhập dữ liệu' },
+                field2: { label: 'Lớp học', name: "class", placeholder: 'nhập dữ liệu' },
             });
-        } else if (path.includes('/parents')) {
+        } else if (location.pathname.includes('/parents')) {
             setSearchConfig({
-                field1: { label: 'Parent Name', placeholder: 'nhập tên phụ huynh' },
-                field2: { label: 'Phone', placeholder: 'nhập số điện thoại' },
+                field1: { label: 'Parent Name', placeholder: 'nhập dữ liệu' },
+                field2: { label: 'Phone', placeholder: 'nhập dữ liệu' },
             });
-        } else if (path.includes('/classes')) {
+        } else if (location.pathname.includes('/classes')) {
             setSearchConfig({
-                field1: { label: 'Class Name', placeholder: 'nhập tên lớp' },
-                field2: { label: 'Grade', placeholder: 'nhập khối' },
+                field1: { label: 'Class Name', placeholder: 'nhập dữ liệu' },
+                field2: { label: 'Grade', placeholder: 'nhập dữ liệu' },
             });
+        } else {
+            setSearchConfig(null);
         }
 
-
-        // Reset form when route changes
         form.resetFields();
     }, [location.pathname, form]);
 
@@ -46,6 +40,7 @@ const SearchBar = () => {
     };
 
     return (
+        searchConfig &&
         <Form
             form={form}
             layout="inline"
@@ -53,12 +48,24 @@ const SearchBar = () => {
             style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
         >
             <div style={{ display: 'flex', gap: '20px' }}>
-                <Form.Item label={searchConfig.field1.label} name={searchConfig.field1.name}>
-                    <Input placeholder={searchConfig.field1.placeholder} style={{ width: 300 }} />
+                <Form.Item
+                    label={searchConfig.field1.label}
+                    name={searchConfig.field1.name}
+                >
+                    <Input
+                        placeholder={searchConfig.field1.placeholder}
+                        style={{ width: 300 }}
+                    />
                 </Form.Item>
 
-                <Form.Item label={searchConfig.field2.label} name={searchConfig.field2.name}>
-                    <Input placeholder={searchConfig.field2.placeholder} style={{ width: 300 }} />
+                <Form.Item
+                    label={searchConfig.field2.label}
+                    name={searchConfig.field2.name}
+                >
+                    <Input
+                        placeholder={searchConfig.field2.placeholder}
+                        style={{ width: 300 }}
+                    />
                 </Form.Item>
             </div>
 
@@ -71,6 +78,7 @@ const SearchBar = () => {
                 </Form.Item>
             </div>
         </Form>
+
     );
 };
 

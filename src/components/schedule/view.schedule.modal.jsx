@@ -3,7 +3,7 @@ const ViewScheduleDetail = () => {
 
     return (
         <>
-            <div>hello</div>
+
         </>
     )
 }

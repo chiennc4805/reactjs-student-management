@@ -12,7 +12,7 @@ const StudentTable = (props) => {
     const [api, contextHolder] = notification.useNotification();
 
     const { dataStudents, loadStudent, pageSize, setPageSize,
-        current, setCurrent, total } = props
+        current, setCurrent, total, classOptions } = props
 
     const [studentDetail, setStudentDetail] = useState(null)
     const [isDetailOpen, setIsDetailOpen] = useState(false)
@@ -93,11 +93,10 @@ const StudentTable = (props) => {
             dataIndex: 'classes',
             render: (classes) => (
                 <>
-                    {classes.map(c => {
-                        return (
-                            <Tag>{c.name}</Tag>
-                        );
-                    })}
+                    {classes.map(c => (
+                        <Tag>{c.name}</Tag>
+                    )
+                    )}
                 </>
             )
         },
@@ -181,6 +180,7 @@ const StudentTable = (props) => {
                 setIsUpdateFormOpen={setIsUpdateFormOpen}
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
+                classOptions={classOptions}
             />
         </>
 

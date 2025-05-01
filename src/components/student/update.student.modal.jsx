@@ -1,8 +1,8 @@
 import { Col, DatePicker, Form, Input, Modal, notification, Row, Select } from "antd";
-import locale from 'antd/es/date-picker/locale/vi_VN'
+import locale from 'antd/es/date-picker/locale/vi_VN';
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
-import customParseFormat from 'dayjs/plugin/customParseFormat'
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useEffect } from "react";
 import { updateStudentAPI } from "../../services/api.service";
 
 
@@ -11,16 +11,19 @@ const UpdateStudentModal = (props) => {
     const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
     const [form] = Form.useForm()
 
-    const { isUpdateFormOpen, setIsUpdateFormOpen, loadStudent, setDataUpdate, dataUpdate } = props
+    const { isUpdateFormOpen, setIsUpdateFormOpen, loadStudent, setDataUpdate, dataUpdate, classOptions } = props
 
     useEffect(() => {
         if (dataUpdate) {
             form.setFieldValue("id", dataUpdate.id)
             form.setFieldValue("name", dataUpdate.name)
             form.setFieldValue("gender", dataUpdate.gender === true ? "Nam" : "Nữ")
+
             const birthDate = dayjs(dataUpdate.birthDate)
             form.setFieldValue("birthDate", birthDate)
-            form.setFieldValue("name", dataUpdate.name)
+
+            const classes = dataUpdate.classes.map(x => x.id)
+            form.setFieldValue("class", classes)
             form.setFieldValue("parentId", dataUpdate.parent?.id)
         }
     }, [dataUpdate])
@@ -36,8 +39,9 @@ const UpdateStudentModal = (props) => {
         dayjs.extend(customParseFormat)
         const birthDate = dayjs(values.birthDate).format('YYYY-MM-DD')
         const gender = values.gender === "1" ? true : false
+        const classes = values.class.map(x => ({ id: x }))
 
-        const res = await updateStudentAPI(values.id, values.name, gender, birthDate)
+        const res = await updateStudentAPI(values.id, values.name, gender, birthDate, classes)
         if (res.data) {
             openNotificationWithIcon('success', 'Thành công', 'Cập nhật học sinh thành công')
             await loadStudent()
@@ -113,10 +117,15 @@ const UpdateStudentModal = (props) => {
                                 name="class"
                                 label="Lớp học"
                             >
-                                <Select mode="multiple" placeholder="Chọn lớp học">
-                                    <Option value="red">Red</Option>
-                                    <Option value="green">Green</Option>
-                                    <Option value="blue">Blue</Option>
+                                <Select
+                                    mode="multiple"
+                                    placeholder="Chọn lớp học"
+                                    options={classOptions}
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                    }
+                                >
                                 </Select>
                             </Form.Item>
                         </Col>

@@ -52,6 +52,7 @@ const StudentPage = () => {
                 pageSize={pageSize}
                 setPageSize={setPageSize}
                 total={total}
+                classOptions={classOptions}
             />
         </>
     )

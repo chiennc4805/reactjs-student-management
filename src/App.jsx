@@ -17,7 +17,6 @@ import { getAccountAPI, logoutAPI } from './services/api.service';
 
 
 function App() {
-
 	const { Header, Sider, Content } = Layout;
 	const [collapsed, setCollapsed] = useState(false);
 	const {
@@ -25,6 +24,8 @@ function App() {
 	} = theme.useToken();
 
 	const { user, setUser } = useContext(AuthContext)
+
+	const [searchConfig, setSearchConfig] = useState(null);
 
 	useEffect(() => {
 		fetchUserInfo()
@@ -181,7 +182,10 @@ function App() {
 							background: colorBgContainer,
 							borderRadius: borderRadiusLG,
 						}}>
-							<SearchBar />
+							<SearchBar
+								searchConfig={searchConfig}
+								setSearchConfig={setSearchConfig}
+							/>
 						</div>
 
 						<div

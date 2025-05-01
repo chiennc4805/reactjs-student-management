@@ -8,23 +8,25 @@ const fetchAllStudentsAPI = (page, pageSize) => {
     return axios.get(URL_BACKEND)
 }
 
-const createStudentAPI = (name, gender, birthDate) => {
+const createStudentAPI = (name, gender, birthDate, classes) => {
     const URL_BACKEND = "/students"
     const data = {
         name: name,
         gender: gender,
-        birthDate: birthDate
+        birthDate: birthDate,
+        classes: classes
     }
     return axios.post(URL_BACKEND, data)
 }
 
-const updateStudentAPI = (id, name, gender, birthDate) => {
+const updateStudentAPI = (id, name, gender, birthDate, classes) => {
     const URL_BACKEND = "/students"
     const data = {
         id: id,
         name: name,
         gender: gender,
-        birthDate: birthDate
+        birthDate: birthDate,
+        classes: classes
     }
     return axios.put(URL_BACKEND, data)
 }
