@@ -8,12 +8,12 @@ import {
 	TeamOutlined,
 	UserOutlined
 } from '@ant-design/icons';
-import { Avatar, Button, Dropdown, Layout, Menu, message, theme } from 'antd';
+import { Avatar, Button, Dropdown, Layout, Menu, theme } from 'antd';
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { AuthContext } from './components/context/auth.context';
 import SearchBar from './components/layout/search.bar';
-import { getAccountAPI, logoutAPI } from './services/api.service';
+import { getAccountAPI, getRefreshToken, logoutAPI } from './services/api.service';
 
 
 function App() {
@@ -29,17 +29,35 @@ function App() {
 
 	useEffect(() => {
 		fetchUserInfo()
+		checkAndRefreshToken()
 	}, [])
 
 	const fetchUserInfo = async () => {
 		const res = await getAccountAPI()
 		if (res.data) {
-			//success
 			setUser(res.data.user)
 		}
 	}
 
-	const handleLogout = async () => {
+	const checkAndRefreshToken = async () => {
+		const accessToken = localStorage.getItem('access_token');
+
+		if (!accessToken) {
+			try {
+				const res = await getRefreshToken(); // Gọi API refresh token
+				if (res.data) {
+					localStorage.setItem('access_token', res.data.access_token); // Lưu token mới
+				} else {
+					handleLogout(false); // Nếu refresh token không hợp lệ, logout
+				}
+			} catch (error) {
+				console.error('Error refreshing token:', error);
+				handleLogout(); // Nếu có lỗi, logout
+			}
+		}
+	};
+
+	const handleLogout = async (mess) => {
 		const res = await logoutAPI()
 		if (res.data) {
 			//clear data
@@ -49,7 +67,9 @@ function App() {
 				name: "",
 				role: ""
 			})
-			message.success("Đăng xuất thành công.")
+			if (mess) {
+				message.success("Đăng xuất thành công.")
+			}
 
 			//redirect to home
 			navigate("/")
@@ -80,7 +100,7 @@ function App() {
 			type: 'divider',
 		},
 		{
-			label: <a onClick={handleLogout}>Đăng xuất</a>,
+			label: <a onClick={() => handleLogout(true)}>Đăng xuất</a>,
 			key: '3',
 		},
 	];

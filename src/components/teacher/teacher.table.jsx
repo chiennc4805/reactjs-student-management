@@ -1,9 +1,9 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Col, notification, Popconfirm, Row, Table, Tag } from 'antd';
 import { useState } from 'react';
-import { deleteSubjectAPI, deleteTeacherAPI } from '../../services/api.service';
-import ViewTeacherDetail from './view.teacher.drawer';
+import { deleteTeacherAPI } from '../../services/api.service';
 import UpdateTeacherModal from './update.teacher.modal';
+import ViewTeacherDetail from './view.teacher.drawer';
 
 
 const TeacherTable = (props) => {
@@ -108,7 +108,8 @@ const TeacherTable = (props) => {
                         );
                     })}
                 </>
-            )
+            ),
+            width: "25%"
         },
         {
             title: 'Trạng thái',

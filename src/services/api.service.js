@@ -256,6 +256,11 @@ const logoutAPI = () => {
     return axios.post(URL_BACKEND)
 }
 
+const getRefreshToken = () => {
+    const URL_BACKEND = "/auth/refresh"
+    return axios.get(URL_BACKEND)
+}
+
 //module schedule api
 const fetchScheduleInWeek = (startDate) => {
     const URL_BACKEND = `/schedule?startDate=${startDate}`
@@ -292,7 +297,6 @@ const deleteScheduleAPI = (id) => {
 
 
 export {
-    createCampusAPI, createClassAPI, createParentAPI, createScheduleAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteScheduleAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI,
-    fetchAllTeachersAPI, fetchScheduleInWeek, getAccountAPI, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateScheduleAPI, updateStudentAPI, updateSubjectAPI, updateTeacherAPI
+    createCampusAPI, createClassAPI, createParentAPI, createScheduleAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteScheduleAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI, fetchAllTeachersAPI, fetchScheduleInWeek, getAccountAPI, getRefreshToken, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateScheduleAPI, updateStudentAPI, updateSubjectAPI, updateTeacherAPI
 };
 
