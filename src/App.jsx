@@ -13,7 +13,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { AuthContext } from './components/context/auth.context';
 import SearchBar from './components/layout/search.bar';
-import { getAccountAPI, getRefreshToken, logoutAPI } from './services/api.service';
+import { getAccountAPI, logoutAPI } from './services/api.service';
 
 
 function App() {
@@ -29,7 +29,6 @@ function App() {
 
 	useEffect(() => {
 		fetchUserInfo()
-		checkAndRefreshToken()
 	}, [])
 
 	const fetchUserInfo = async () => {
@@ -38,24 +37,6 @@ function App() {
 			setUser(res.data.user)
 		}
 	}
-
-	const checkAndRefreshToken = async () => {
-		const accessToken = localStorage.getItem('access_token');
-
-		if (!accessToken) {
-			try {
-				const res = await getRefreshToken(); // Gọi API refresh token
-				if (res.data) {
-					localStorage.setItem('access_token', res.data.access_token); // Lưu token mới
-				} else {
-					handleLogout(false); // Nếu refresh token không hợp lệ, logout
-				}
-			} catch (error) {
-				console.error('Error refreshing token:', error);
-				handleLogout(); // Nếu có lỗi, logout
-			}
-		}
-	};
 
 	const handleLogout = async (mess) => {
 		const res = await logoutAPI()
