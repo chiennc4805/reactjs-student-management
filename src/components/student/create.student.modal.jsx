@@ -1,20 +1,22 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Col, DatePicker, Form, Input, Modal, Row, Select, notification } from "antd";
+import { Button, Col, DatePicker, Form, Input, InputNumber, Modal, Row, Select, notification } from "antd";
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import dayjs from "dayjs";
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useState } from "react";
-import { createStudentAPI } from "../../services/api.service";
+import { createParentAPI, createStudentAPI, fetchAllParentsAPI } from "../../services/api.service";
 
 const StudentForm = (props) => {
 
-    const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
+    const [api, contextHolder] = notification.useNotification({ maxCount: 2 });
 
     const [isFormOpen, setIsFormOpen] = useState(false)
 
     const { loadStudent, classOptions } = props
 
     const [form] = Form.useForm();
+
+    const [parentData, setParentData] = useState(null)
 
     const openNotificationWithIcon = (type, message, description) => {
         api[type]({
@@ -23,17 +25,27 @@ const StudentForm = (props) => {
         });
     };
 
-    // useEffect(() => {
-
-    // }, [])
-
     const onFinish = async (values) => {
         dayjs.extend(customParseFormat)
-        const birthDate = dayjs(values.birthDate).format('YYYY-MM-DD')
-        const gender = values.gender === "1" ? true : false
-        const classes = values.class.map(x => ({ id: x }))
 
-        const res = await createStudentAPI(values.name, gender, birthDate, classes)
+        if (!parentData) {
+            const birthDateParent = dayjs(values.parentBirthDate).format('YYYY-MM-DD')
+            const genderParent = values.parentGender === "1" ? true : false
+            const resParentAPI = await createParentAPI(values.parentName, genderParent, birthDateParent, values.parentTelephone, values.parentAddress, values.parentZaloName, values.parentFacebookName)
+            if (resParentAPI.data) {
+                openNotificationWithIcon('success', 'Thành công', 'Thêm mới phụ huynh thành công')
+            } else {
+                openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
+                return
+            }
+        }
+
+        const birthDateStudent = dayjs(values.birthDate).format('YYYY-MM-DD')
+        const genderStudent = values.gender === "1" ? true : false
+        const classesStudent = values.class.map(x => ({ id: x }))
+        const parent = { telephone: values.parentTelephone }
+
+        const res = await createStudentAPI(values.name, genderStudent, birthDateStudent, values.height, values.weight, classesStudent, parent)
         if (res.data) {
             openNotificationWithIcon('success', 'Thành công', 'Thêm mới học sinh thành công')
             await loadStudent()
@@ -44,6 +56,34 @@ const StudentForm = (props) => {
         }
 
     };
+
+    const fetchParentInfoByInput = async (input) => {
+        const phonePattern = /^0\d{9}$/;
+        if (phonePattern.test(input)) {
+            const res = await fetchAllParentsAPI(1, 1, `telephone~'${input}'`)
+            if (res.data.meta.total === 1 && !parentData) {
+                const data = res.data.result[0]
+                form.setFieldValue("parentName", data.name)
+                form.setFieldValue("parentAddress", data.address)
+                form.setFieldValue("parentGender", data.gender === true ? "Nam" : "Nữ")
+
+                const birthDate = dayjs(data.birthDate)
+                form.setFieldValue("parentBirthDate", birthDate)
+
+                form.setFieldValue("parentZaloName", data.zaloName)
+                form.setFieldValue("parentFacebookName", data.facebookName)
+
+                setParentData(res.data.result[0])
+
+            }
+        } else {
+            form.resetFields(["parentName", "parentAddress", "parentGender", "parentBirthDate", "parentZaloName", "parentFacebookName"])
+            if (parentData) {
+                setParentData(null)
+            }
+        }
+    }
+
     return (
         <>
             {contextHolder}
@@ -138,8 +178,8 @@ const StudentForm = (props) => {
                                     placeholder="Chọn giới tính"
                                     allowClear={true}
                                 >
-                                    <Option value="1">Nam</Option>
-                                    <Option value="0">Nữ</Option>
+                                    <Select.Option value="1">Nam</Select.Option>
+                                    <Select.Option value="0">Nữ</Select.Option>
                                 </Select>
                             </Form.Item>
 
@@ -151,11 +191,28 @@ const StudentForm = (props) => {
                                 <DatePicker locale={locale} />
                             </Form.Item>
 
-                            <Form.Item style={{ width: "48%" }}
-                                label="Số điện thoại phụ huynh (phân vân id hay sđt parent)"
-                                name="parentTelephone"
+                            <Form.Item style={{ width: "23%" }}
+                                label="Chiều cao"
+                                name="height"
+                                initialValue={""}
+                                rules={[{ required: true, message: 'Vui lòng điền chiều cao!' }]}
                             >
-                                <Input placeholder="Nhập ID của phụ huynh" />
+                                <InputNumber
+                                    addonBefore="+"
+                                    addonAfter="cm"
+                                />
+                            </Form.Item>
+
+                            <Form.Item style={{ width: "23%" }}
+                                label="Cân nặng"
+                                name="weight"
+                                initialValue={""}
+                                rules={[{ required: true, message: 'Vui lòng điền cân nặng!' }]}
+                            >
+                                <InputNumber
+                                    addonBefore="+"
+                                    addonAfter="kg"
+                                />
                             </Form.Item>
                         </Col>
 
@@ -164,59 +221,152 @@ const StudentForm = (props) => {
                         </Col>
 
                         {/* row 1  phụ huynh */}
-                        <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
-                            <Form.Item style={{ width: "32%" }}
-                                label="Họ và tên"
-                                name="parentName"
-                            >
-                                <Input disabled />
-                            </Form.Item>
+                        {parentData ?
+                            <>
+                                <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <Form.Item style={{ width: "32%" }}
+                                        label="Số điện thoại"
+                                        name="parentTelephone"
+                                        rules={[
+                                            {
+                                                required: true, message: 'Vui lòng điền số điện thoại phụ huynh!'
+                                            },
+                                            {
+                                                pattern: /^0\d{9}$/,
+                                                message: 'Vui lòng điền số điện thoại hợp lệ',
+                                            }
+                                        ]}
+                                    >
+                                        <Input onChange={(event) => { fetchParentInfoByInput(event.target.value) }} />
+                                    </Form.Item>
 
-                            <Form.Item style={{ width: "32%" }}
-                                label="Số điện thoại"
-                                name="parentTelephone"
-                            >
-                                <Input disabled />
-                            </Form.Item>
+                                    <Form.Item style={{ width: "32%" }}
+                                        label="Họ và tên"
+                                        name="parentName"
+                                    >
+                                        <Input disabled />
+                                    </Form.Item>
 
-                            <Form.Item style={{ width: "32%" }}
-                                label="Địa chỉ"
-                                name="parentAddress"
-                            >
-                                <Input disabled />
-                            </Form.Item>
-                        </Col>
+                                    <Form.Item style={{ width: "32%" }}
+                                        label="Địa chỉ"
+                                        name="parentAddress"
+                                    >
+                                        <Input disabled />
+                                    </Form.Item>
+                                </Col>
 
-                        {/* row 2  phụ huynh */}
-                        <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
-                            <Form.Item style={{ width: "23%" }}
-                                label="Giới tính"
-                                name="parentGender"
-                            >
-                                <Input disabled />
-                            </Form.Item >
+                                <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <Form.Item style={{ width: "23%" }}
+                                        label="Giới tính"
+                                        name="parentGender"
+                                    >
+                                        <Select
+                                            placeholder="Chọn giới tính"
+                                            allowClear={true}
+                                            disabled
+                                        >
+                                            <Select.Option value="1">Nam</Select.Option>
+                                            <Select.Option value="0">Nữ</Select.Option>
+                                        </Select>
+                                    </Form.Item >
 
-                            <Form.Item style={{ width: "23%" }}
-                                label="Ngày sinh"
-                                name="parentBirthDate"
-                            >
-                                <Input disabled />
-                            </Form.Item>
+                                    <Form.Item style={{ width: "23%" }}
+                                        label="Ngày sinh"
+                                        name="parentBirthDate"
+                                    >
+                                        <DatePicker locale={locale} disabled />
+                                    </Form.Item>
 
-                            <Form.Item style={{ width: "23%" }}
-                                label="Tên Zalo"
-                                name="zaloName"
-                            >
-                                <Input disabled />
-                            </Form.Item>
+                                    <Form.Item style={{ width: "23%" }}
+                                        label="Tên Zalo"
+                                        name="parentZaloName"
+                                    >
+                                        <Input disabled />
+                                    </Form.Item>
 
-                            <Form.Item style={{ width: "23%" }}
-                                label="Tên Facebook"
-                                name="facebookName"
-                            >
-                                <Input disabled />
-                            </Form.Item>
-                        </Col>
+                                    <Form.Item style={{ width: "23%" }}
+                                        label="Tên Facebook"
+                                        name="parentFacebookName"
+                                    >
+                                        <Input disabled />
+                                    </Form.Item>
+                                </Col>
+                            </>
+                            :
+                            <>
+                                <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <Form.Item style={{ width: "32%" }}
+                                        label="Số điện thoại"
+                                        name="parentTelephone"
+                                        rules={[
+                                            {
+                                                required: true, message: 'Vui lòng điền số điện thoại!'
+                                            },
+                                            {
+                                                pattern: /^0\d{9}$/,
+                                                message: 'Vui lòng điền số điện thoại hợp lệ',
+                                            }
+                                        ]}
+                                    >
+                                        <Input onChange={(event) => { fetchParentInfoByInput(event.target.value) }} />
+                                    </Form.Item>
+
+                                    <Form.Item style={{ width: "32%" }}
+                                        label="Họ và tên"
+                                        name="parentName"
+                                        rules={[{ required: true, message: 'Vui lòng nhập họ và tên!' }]}
+                                    >
+                                        <Input />
+                                    </Form.Item>
+
+                                    <Form.Item style={{ width: "32%" }}
+                                        label="Địa chỉ"
+                                        name="parentAddress"
+                                        rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}
+                                    >
+                                        <Input />
+                                    </Form.Item>
+                                </Col>
+
+                                <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
+                                    <Form.Item style={{ width: "25%" }}
+                                        label="Giới tính"
+                                        name="parentGender"
+                                        rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
+                                    >
+                                        <Select
+                                            placeholder="Chọn giới tính"
+                                            allowClear={true}
+                                        >
+                                            <Select.Option value="1">Nam</Select.Option>
+                                            <Select.Option value="0">Nữ</Select.Option>
+                                        </Select>
+                                    </Form.Item >
+
+                                    <Form.Item style={{ width: "23%" }}
+                                        label="Ngày sinh"
+                                        name="parentBirthDate"
+                                        rules={[{ required: true, message: 'Vui lòng chọn ngày sinh!' }]}
+                                    >
+                                        <DatePicker locale={locale} />
+                                    </Form.Item>
+
+                                    <Form.Item style={{ width: "23%" }}
+                                        label="Tên Zalo"
+                                        name="parentZaloName"
+                                    >
+                                        <Input />
+                                    </Form.Item>
+
+                                    <Form.Item style={{ width: "23%" }}
+                                        label="Tên Facebook"
+                                        name="parentFacebookName"
+                                    >
+                                        <Input />
+                                    </Form.Item>
+                                </Col>
+                            </>
+                        }
                     </Row>
                 </Form>
             </Modal>

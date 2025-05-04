@@ -1,5 +1,7 @@
 import {
+	BankOutlined,
 	BugOutlined,
+	ExceptionOutlined,
 	HomeOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
@@ -13,7 +15,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { AuthContext } from './components/context/auth.context';
 import SearchBar from './components/layout/search.bar';
-import { getAccountAPI, logoutAPI } from './services/api.service';
+import { fetchAllCampusWithoutPaginationAPI, fetchAllClassesWithoutPaginationAPI, getAccountAPI, logoutAPI } from './services/api.service';
 
 
 function App() {
@@ -25,10 +27,13 @@ function App() {
 
 	const { user, setUser } = useContext(AuthContext)
 
+	const [scheduleMenuItems, setScheduleMenuItems] = useState([]);
+
 	const [searchConfig, setSearchConfig] = useState(null);
 
 	useEffect(() => {
 		fetchUserInfo()
+		fetchScheduleMenuItems()
 	}, [])
 
 	const fetchUserInfo = async () => {
@@ -37,6 +42,29 @@ function App() {
 			setUser(res.data.user)
 		}
 	}
+
+	const fetchScheduleMenuItems = async () => {
+		const resCampusAPI = await fetchAllCampusWithoutPaginationAPI();
+		if (resCampusAPI.data && Array.isArray(resCampusAPI.data.result)) {
+			const campusItems = await Promise.all(
+				resCampusAPI.data.result.map(async (campusItem) => {
+					const resClassMenuItemsOfCampus = await fetchAllClassesWithoutPaginationAPI(`campus.name~'${campusItem.name}'`);
+					const classItems = resClassMenuItemsOfCampus.data && Array.isArray(resClassMenuItemsOfCampus.data.result)
+						? resClassMenuItemsOfCampus.data.result.map((item) => ({
+							key: `class${item.id}`,
+							label: item.name,
+						}))
+						: [];
+					return {
+						key: `campus${campusItem.id}`,
+						label: campusItem.name,
+						children: classItems,
+					};
+				})
+			);
+			setScheduleMenuItems(campusItems);
+		}
+	};
 
 	const handleLogout = async (mess) => {
 		const res = await logoutAPI()
@@ -95,39 +123,49 @@ function App() {
 					</div>
 					<Menu
 						mode="inline"
+						style={{
+							height: 'calc(100vh - 60px)',
+							overflowY: "auto",
+							scrollbarWidth: "thin"
+						}}
 						items={[
 							{
-								key: "1",
-								label: <Link to="/students">Học sinh</Link>,
-								icon: <UserOutlined />
+								key: "person",
+								label: "Nhân sự",
+								icon: <UserOutlined />,
+								children: [
+									{
+										key: "person1",
+										label: <Link to="/student">Học sinh</Link>
+									},
+									{
+										key: "person2",
+										label: <Link to="/parent">Phụ huynh</Link>
+									},
+									{
+										key: "person3",
+										label: <Link to="/teacher">Giáo viên</Link>
+									},
+								]
 							},
 							{
-								key: "2",
-								label: <Link to="/parents">Phụ huynh</Link>,
-								icon: <UserOutlined />
-							},
-							{
-								key: "3",
-								label: <Link to="/teachers">Giáo viên</Link>,
-								icon: <UserOutlined />
-							},
-							{
-								key: "4",
-								label: <Link to="/classes">Lớp học</Link>,
-								icon: <TeamOutlined />
-							},
-							{
-								key: "5",
-								label: <Link to="/subjects">Môn học</Link>,
+								key: "subject",
+								label: <Link to="/subject">Môn học</Link>,
 								icon: <ReadOutlined />
 							},
 							{
-								key: "6",
-								label: <Link to="/schedules">Lịch học</Link>,
-								icon: <ScheduleOutlined />
+								key: "class",
+								label: <Link to="/class">Lớp học</Link>,
+								icon: <BankOutlined />
 							},
 							{
-								key: "7",
+								key: "schedule",
+								label: "Lịch học",
+								icon: <ScheduleOutlined />,
+								children: scheduleMenuItems
+							},
+							{
+								key: "campus",
 								label: "Cơ sở",
 								icon: <HomeOutlined />,
 								children: [
@@ -135,9 +173,19 @@ function App() {
 										label: <Link to="/campus">Thông tin</Link>
 									},
 									{
-										label: <Link to="/facilities">Thiết bị</Link>
+										label: <Link to="/facility">Thiết bị</Link>
 									},
 								]
+							},
+							{
+								key: "user",
+								label: <Link to="/user">Tài khoản</Link>,
+								icon: <TeamOutlined />
+							},
+							{
+								key: "role",
+								label: <Link to="/role">Vai trò</Link>,
+								icon: <ExceptionOutlined />
 							},
 						]}
 					/>

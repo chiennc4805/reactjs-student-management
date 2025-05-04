@@ -1,17 +1,16 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Col, notification, Popconfirm, Row, Table, Tag } from 'antd';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { deleteClassAPI } from '../../services/api.service';
-import UpdateClassModal from './update.class.modal';
+import UpdateRoleModal from './update.role.modal';
 
 
-const ClassTable = (props) => {
+const RoleTable = (props) => {
 
     const [api, contextHolder] = notification.useNotification();
 
-    const { dataClasses, loadClass, pageSize, setPageSize,
-        current, setCurrent, total, campusOptions, subjectOptions } = props
+    const { dataRoles, loadRole, pageSize, setPageSize,
+        current, setCurrent, total } = props
 
     const [dataUpdate, setDataUpdate] = useState(null)
     const [isUpdateFormOpen, setIsUpdateFormOpen] = useState(false)
@@ -23,11 +22,11 @@ const ClassTable = (props) => {
         });
     };
 
-    const handleDeleteClass = async (id) => {
+    const handleDeleteRole = async (id) => {
         const res = await deleteClassAPI(id)
         if (res.data) {
-            openNotificationWithIcon('success', 'Thành công', 'Xoá lớp học thành công')
-            await loadClass()
+            openNotificationWithIcon('success', 'Thành công', 'Xoá vai trò thành công')
+            await loadRole()
         } else {
             openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
         }
@@ -39,49 +38,43 @@ const ClassTable = (props) => {
             dataIndex: 'stt',
             render: (_, record, index) => {
                 return (
-                    <Link to={`/class/${record.name}`}>
+                    <span>
                         {(index + 1) + (current - 1) * 10}
-                    </Link>
+                    </span>
                 )
-            },
-            width: "6%"
+            }
         },
         {
-            title: 'Tên lớp học',
+            title: 'ID',
+            dataIndex: 'id',
+            render: (id) => {
+                return (
+                    <span>
+                        {id}
+                    </span>
+                )
+            }
+        },
+        {
+            title: 'Tên vai trò',
             dataIndex: 'name',
-            width: "14%"
         },
         {
-            title: 'Dạy môn',
-            dataIndex: 'subject',
-            render: (subject) => (
-                <Tag>
-                    {subject.name}
-                </Tag>
-            )
+            title: 'Miêu tả',
+            dataIndex: 'description',
         },
         {
-            title: 'Giáo viên',
-            dataIndex: 'teacher',
-            render: (teacher) => (
-                <Tag>
-                    {teacher.name} - {teacher.telephone}
-                </Tag>
-            )
-        },
-        {
-            title: 'Cơ sở',
-            dataIndex: 'campus',
-            render: (campus) => (
-                <Tag>
-                    {campus.name} - {campus.address}
-                </Tag>
-            )
+            title: 'Trạng thái',
+            render: (active) => {
+                return (
+                    <Tag color={active ? "success" : "failure"}>{active ? "ACTIVE" : "INACTIVE"}</Tag>
+                )
+            }
         },
         {
             title: 'Action',
             key: 'action',
-            render: (_, record) => ( //record là bản ghi (record tương ứng với dòng dữ liệu)
+            render: (_, record) => (
                 <div style={{ display: "flex", gap: "20px" }}>
                     <EditOutlined style={{ cursor: "pointer", color: "orange" }}
                         onClick={() => {
@@ -90,9 +83,9 @@ const ClassTable = (props) => {
                         }} />
 
                     <Popconfirm
-                        title="Xoá lớp học"
-                        description="Bạn chắc chắn xoá lớp học này?"
-                        onConfirm={() => handleDeleteClass(record.id)}
+                        title="Xoá vai trò"
+                        description="Bạn chắc chắn xoá vai trò này?"
+                        onConfirm={() => handleDeleteRole(record.id)}
                         okText="Có"
                         cancelText="Không"
                         placement='left'
@@ -104,19 +97,17 @@ const ClassTable = (props) => {
         },
     ];
 
-    const onChange = (pagination, filters, sorter, extra) => { //các tham số trên antd cung cấp sẵn
-        //setCurrent, setPageSize
-        //nếu thay đổi trang: current
+    const onChange = (pagination, filters, sorter, extra) => {
         if (pagination && pagination.current) {
             if (+pagination.current !== +current) {
-                setCurrent(+pagination.current) //convert về number
+                setCurrent(+pagination.current)
             }
         }
 
         //nếu thay đổi tổng số phần tử: pageSize
         if (pagination && pagination.pageSize) {
             if (+pagination.pageSize !== +pageSize) {
-                setPageSize(+pagination.pageSize) //convert về number
+                setPageSize(+pagination.pageSize)
             }
         }
     };
@@ -131,7 +122,7 @@ const ClassTable = (props) => {
                     <Table
                         rowKey={"id"}
                         columns={columns}
-                        dataSource={dataClasses}
+                        dataSource={dataRoles}
                         bordered={true}
                         size='large'
                         pagination={
@@ -147,14 +138,12 @@ const ClassTable = (props) => {
                 </Col>
             </Row>
 
-            <UpdateClassModal
-                loadClass={loadClass}
+            <UpdateRoleModal
+                loadRole={loadRole}
                 isUpdateFormOpen={isUpdateFormOpen}
                 setIsUpdateFormOpen={setIsUpdateFormOpen}
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
-                campusOptions={campusOptions}
-                subjectOptions={subjectOptions}
             />
         </>
 
@@ -162,4 +151,4 @@ const ClassTable = (props) => {
 
 }
 
-export default ClassTable;
+export default RoleTable;

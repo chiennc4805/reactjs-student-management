@@ -4,16 +4,19 @@ import {
 	RouterProvider,
 } from "react-router-dom";
 import App from './App.jsx';
+import ClassDetailPage from './components/class/view.class.page.jsx';
 import { AuthWrapper } from './components/context/auth.context.jsx';
 import CampusPage from './pages/campus.jsx';
 import ClassPage from './pages/class.jsx';
 import FacilityPage from './pages/facility.jsx';
 import LoginPage from './pages/login.jsx';
 import ParentPage from './pages/parent.jsx';
+import RolePage from './pages/role.jsx';
 import SchedulePage from './pages/schedule.jsx';
 import StudentPage from './pages/student.jsx';
 import SubjectPage from './pages/subject.jsx';
 import TeacherPage from './pages/teacher.jsx';
+import UserPage from './pages/user.jsx';
 import Welcome from './pages/welcome.jsx';
 import './styles/global.css';
 
@@ -27,36 +30,48 @@ const router = createBrowserRouter([
 				element: <Welcome />
 			},
 			{
-				path: "/students",
+				path: "student",
 				element: <StudentPage />
 			},
 			{
-				path: "/schedules",
+				path: "schedule",
 				element: <SchedulePage />
 			},
 			{
-				path: "/campus",
+				path: "campus",
 				element: <CampusPage />
 			},
 			{
-				path: "/facilities",
+				path: "facility",
 				element: <FacilityPage />
 			},
 			{
-				path: "/parents",
+				path: "parent",
 				element: <ParentPage />
 			},
 			{
-				path: "/classes",
+				path: "class",
 				element: <ClassPage />
 			},
 			{
-				path: "/subjects",
+				path: "class/:name",
+				element: <ClassDetailPage />
+			},
+			{
+				path: "subject",
 				element: <SubjectPage />
 			},
 			{
-				path: "/teachers",
+				path: "teacher",
 				element: <TeacherPage />
+			},
+			{
+				path: "role",
+				element: <RolePage />
+			},
+			{
+				path: "user",
+				element: <UserPage />
 			},
 		]
 	},

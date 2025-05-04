@@ -47,7 +47,7 @@ instance.interceptors.response.use(
         }
 
         // If refresh token fails or other errors occur
-        return Promise.reject(error);
+        return error.response.data;
     }
 );
 

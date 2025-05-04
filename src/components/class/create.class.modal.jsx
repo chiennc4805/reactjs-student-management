@@ -1,7 +1,5 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Col, DatePicker, Form, Input, Modal, notification, Row, Select } from "antd";
-import dayjs from "dayjs";
-import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { Button, Col, Form, Input, Modal, notification, Row, Select } from "antd";
 import { useState } from "react";
 import { createClassAPI } from "../../services/api.service";
 
@@ -27,10 +25,7 @@ const ClassForm = (props) => {
         const teacher = { telephone: values.teacher }
         const campus = { id: values.campus }
 
-        dayjs.extend(customParseFormat)
-        const openDay = dayjs(values.openDay).format('YYYY-MM-DD')
-
-        const res = await createClassAPI(values.name, subject, teacher, campus, openDay)
+        const res = await createClassAPI(values.name, subject, teacher, campus)
         if (res.data) {
             openNotificationWithIcon('success', 'Thành công', 'Thêm mới lớp học thành công')
             await loadClass()
@@ -138,16 +133,6 @@ const ClassForm = (props) => {
                                 >
 
                                 </Select>
-                            </Form.Item>
-                        </Col>
-
-                        <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
-                            <Form.Item style={{ width: "48%" }}
-                                label="Ngày khai giảng"
-                                name="openDay"
-                                rules={[{ required: true, message: 'Vui lòng chọn ngày khai giảng !' }]}
-                            >
-                                <DatePicker picker="date" format={"DD/MM/YYYY"} placeholder="DD/MM/YYYY" />
                             </Form.Item>
                         </Col>
 

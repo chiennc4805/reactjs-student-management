@@ -42,24 +42,13 @@ const StudentTable = (props) => {
             dataIndex: 'stt',
             render: (_, record, index) => {
                 return (
-                    <span>
-                        {(index + 1) + (current - 1) * 10}
-                    </span>
-                )
-            }
-        },
-        {
-            title: 'ID',
-            dataIndex: 'id',
-            render: (_, record) => {
-                return (
                     <a href='#'
                         onClick={() => {
                             setStudentDetail(record)
                             setIsDetailOpen(true);
                         }}
                     >
-                        {record.id}
+                        {(index + 1) + (current - 1) * 10}
                     </a>
                 )
             }
@@ -87,6 +76,14 @@ const StudentTable = (props) => {
                     {dayjs(birthDate).format("DD-MM-YYYY")}
                 </span>
             )
+        },
+        {
+            title: 'Chiều cao (cm)',
+            dataIndex: 'height',
+        },
+        {
+            title: 'Cân nặng (kg)',
+            dataIndex: 'weight',
         },
         {
             title: 'Lớp học',

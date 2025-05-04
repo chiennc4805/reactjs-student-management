@@ -1,32 +1,43 @@
 import axios from "./axios.customize";
 
 //module student api
-const fetchAllStudentsAPI = (page, pageSize) => {
-    const URL_BACKEND = `/students?page=${page}&size=${pageSize}`
-    // const URL_BACKEND = `/students?page=${page}&size=${pageSize}&filter=${filter}`
+const fetchAllStudentsAPI = (page, pageSize, filter = null) => {
+    let URL_BACKEND
+    if (filter) {
+        URL_BACKEND = `/students?page=${page}&size=${pageSize}&filter=${filter}`
+    }
+    else {
+        URL_BACKEND = `/students?page=${page}&size=${pageSize}`
+    }
 
     return axios.get(URL_BACKEND)
 }
 
-const createStudentAPI = (name, gender, birthDate, classes) => {
+const createStudentAPI = (name, gender, birthDate, height, weight, classes, parent) => {
     const URL_BACKEND = "/students"
     const data = {
         name: name,
         gender: gender,
         birthDate: birthDate,
-        classes: classes
+        height: height,
+        weight: weight,
+        classes: classes,
+        parent: parent
     }
     return axios.post(URL_BACKEND, data)
 }
 
-const updateStudentAPI = (id, name, gender, birthDate, classes) => {
+const updateStudentAPI = (id, name, gender, birthDate, height, weight, classes, parent) => {
     const URL_BACKEND = "/students"
     const data = {
         id: id,
         name: name,
         gender: gender,
         birthDate: birthDate,
-        classes: classes
+        height: height,
+        weight: weight,
+        classes: classes,
+        parent: parent
     }
     return axios.put(URL_BACKEND, data)
 }
@@ -38,8 +49,13 @@ const deleteStudentAPI = (id) => {
 
 
 //module parent api
-const fetchAllParentsAPI = (page, pageSize) => {
-    const URL_BACKEND = `/parents?page=${page}&size=${pageSize}`
+const fetchAllParentsAPI = (page, pageSize, filter = null) => {
+    let URL_BACKEND
+    if (filter) {
+        URL_BACKEND = `/parents?page=${page}&size=${pageSize}&filter=${filter}`
+    } else {
+        URL_BACKEND = `/parents?page=${page}&size=${pageSize}`
+    }
     return axios.get(URL_BACKEND)
 }
 
@@ -154,8 +170,14 @@ const deleteSubjectAPI = (id) => {
 }
 
 //module teacher api
-const fetchAllTeachersAPI = (page, pageSize) => {
-    const URL_BACKEND = `/teachers?page=${page}&size=${pageSize}`
+const fetchAllTeachersAPI = (page, pageSize, filter = null) => {
+    let URL_BACKEND
+    if (filter) {
+        URL_BACKEND = `/teachers?page=${page}&size=${pageSize}&filter=${filter}`
+    }
+    else {
+        URL_BACKEND = `/teachers?page=${page}&size=${pageSize}`
+    }
     return axios.get(URL_BACKEND)
 }
 
@@ -196,8 +218,14 @@ const deleteTeacherAPI = (id) => {
 }
 
 //module class api
-const fetchAllClassesWithoutPaginationAPI = () => {
-    const URL_BACKEND = `/classes`
+const fetchAllClassesWithoutPaginationAPI = (filter = null) => {
+    let URL_BACKEND
+    if (filter) {
+        URL_BACKEND = `/classes?filter=${filter}`
+    }
+    else {
+        URL_BACKEND = `/classes`
+    }
     return axios.get(URL_BACKEND)
 }
 
@@ -206,27 +234,25 @@ const fetchAllClassesAPI = (page, pageSize) => {
     return axios.get(URL_BACKEND)
 }
 
-const createClassAPI = (name, subject, teacher, campus, openDay) => {
+const createClassAPI = (name, subject, teacher, campus) => {
     const URL_BACKEND = "/classes"
     const data = {
         name: name,
         subject: subject,
         teacher: teacher,
-        campus: campus,
-        openDay: openDay
+        campus: campus
     }
     return axios.post(URL_BACKEND, data)
 }
 
-const updateClassAPI = (id, name, subject, teacher, campus, openDay) => {
+const updateClassAPI = (id, name, subject, teacher, campus) => {
     const URL_BACKEND = "/classes"
     const data = {
         id: id,
         name: name,
         subject: subject,
         teacher: teacher,
-        campus: campus,
-        openDay: openDay
+        campus: campus
     }
     return axios.put(URL_BACKEND, data)
 }
@@ -295,8 +321,60 @@ const deleteScheduleAPI = (id) => {
     return axios.delete(URL_BACKEND)
 }
 
+//module role api
+const fetchAllRolesAPI = (page, pageSize) => {
+    const URL_BACKEND = `/roles?page=${page}&size=${pageSize}`
+    return axios.get(URL_BACKEND)
+}
+
+const createRoleAPI = (classInfo, slotNumber, weekdayList) => {
+    const URL_BACKEND = "/roles"
+    const data = {
+        classInfo: classInfo,
+        slotNumber: slotNumber,
+        weekdayList: weekdayList
+    }
+    return axios.post(URL_BACKEND, data)
+}
+
+const updateRoleAPI = (id, name, subject, teacher, campus, openDay) => {
+    const URL_BACKEND = "/roles"
+    const data = {
+        id: id,
+        name: name,
+        subject: subject,
+        teacher: teacher,
+        campus: campus,
+        openDay: openDay
+    }
+    return axios.put(URL_BACKEND, data)
+}
+
+const deleteRoleAPI = (id) => {
+    const URL_BACKEND = `/roles/${id}`
+    return axios.delete(URL_BACKEND)
+}
+
+//module permission api
+const fetchAllPermissionsAPI = (page, pageSize) => {
+    const URL_BACKEND = `/permissions?page=${page}&size=${pageSize}`
+    return axios.get(URL_BACKEND)
+}
+
+//module class enrollment api
+const fetchAllClassEnrollmentAPIWithoutPagination = (filter = null) => {
+    let URL_BACKEND
+    if (filter) {
+        URL_BACKEND = `/class-enrollments?filter=${filter}`
+    }
+    else {
+        URL_BACKEND = `/class-enrollments`
+    }
+    return axios.get(URL_BACKEND)
+}
+
 
 export {
-    createCampusAPI, createClassAPI, createParentAPI, createScheduleAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteScheduleAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI, fetchAllTeachersAPI, fetchScheduleInWeek, getAccountAPI, getRefreshToken, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateScheduleAPI, updateStudentAPI, updateSubjectAPI, updateTeacherAPI
+    createCampusAPI, createClassAPI, createParentAPI, createRoleAPI, createScheduleAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteRoleAPI, deleteScheduleAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassEnrollmentAPIWithoutPagination, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllPermissionsAPI, fetchAllRolesAPI, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI, fetchAllTeachersAPI, fetchScheduleInWeek, getAccountAPI, getRefreshToken, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateRoleAPI, updateScheduleAPI, updateStudentAPI, updateSubjectAPI, updateTeacherAPI
 };
 

@@ -12,12 +12,12 @@ const SearchBar = (props) => {
 
     useEffect(() => {
 
-        if (location.pathname.includes('/students')) {
+        if (location.pathname.includes('/student')) {
             setSearchConfig({
                 field1: { label: 'Họ và tên', name: 'name', placeholder: 'nhập dữ liệu' },
                 field2: { label: 'Lớp học', name: "class", placeholder: 'nhập dữ liệu' },
             });
-        } else if (location.pathname.includes('/parents')) {
+        } else if (location.pathname.includes('/parent')) {
             setSearchConfig({
                 field1: { label: 'Parent Name', placeholder: 'nhập dữ liệu' },
                 field2: { label: 'Phone', placeholder: 'nhập dữ liệu' },
@@ -36,6 +36,7 @@ const SearchBar = (props) => {
 
     const onFinish = (values) => {
         console.log('Search values:', values);
+        setSearchConfig("abc")
         // Handle search logic here
     };
 
