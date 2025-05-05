@@ -1,7 +1,7 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Col, notification, Popconfirm, Row, Table, Tag } from 'antd';
 import { useState } from 'react';
-import { deleteClassAPI } from '../../services/api.service';
+import { deleteRoleAPI } from '../../services/api.service';
 import UpdateRoleModal from './update.role.modal';
 
 
@@ -10,7 +10,7 @@ const RoleTable = (props) => {
     const [api, contextHolder] = notification.useNotification();
 
     const { dataRoles, loadRole, pageSize, setPageSize,
-        current, setCurrent, total } = props
+        current, setCurrent, total, listPermissions } = props
 
     const [dataUpdate, setDataUpdate] = useState(null)
     const [isUpdateFormOpen, setIsUpdateFormOpen] = useState(false)
@@ -23,7 +23,7 @@ const RoleTable = (props) => {
     };
 
     const handleDeleteRole = async (id) => {
-        const res = await deleteClassAPI(id)
+        const res = await deleteRoleAPI(id)
         if (res.data) {
             openNotificationWithIcon('success', 'Thành công', 'Xoá vai trò thành công')
             await loadRole()
@@ -144,6 +144,7 @@ const RoleTable = (props) => {
                 setIsUpdateFormOpen={setIsUpdateFormOpen}
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
+                listPermissions={listPermissions}
             />
         </>
 

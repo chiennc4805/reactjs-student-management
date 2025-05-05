@@ -332,25 +332,25 @@ const fetchAllRolesAPI = (page, pageSize) => {
     return axios.get(URL_BACKEND)
 }
 
-const createRoleAPI = (classInfo, slotNumber, weekdayList) => {
+const createRoleAPI = (name, description, active, permissions) => {
     const URL_BACKEND = "/roles"
     const data = {
-        classInfo: classInfo,
-        slotNumber: slotNumber,
-        weekdayList: weekdayList
+        name: name,
+        description: description,
+        active: active,
+        permissions: permissions
     }
     return axios.post(URL_BACKEND, data)
 }
 
-const updateRoleAPI = (id, name, subject, teacher, campus, openDay) => {
+const updateRoleAPI = (id, name, description, active, permissions) => {
     const URL_BACKEND = "/roles"
     const data = {
         id: id,
         name: name,
-        subject: subject,
-        teacher: teacher,
-        campus: campus,
-        openDay: openDay
+        description: description,
+        active: active,
+        permissions: permissions
     }
     return axios.put(URL_BACKEND, data)
 }

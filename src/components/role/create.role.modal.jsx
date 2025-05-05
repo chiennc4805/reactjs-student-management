@@ -1,10 +1,8 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Form, Input, Modal, notification, Row, Switch } from "antd";
-import dayjs from "dayjs";
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { useEffect, useState } from "react";
-import { createClassAPI, fetchAllPermissionsAPI } from "../../services/api.service";
-import ModuleApi from "./list.module.api";
+import { useState } from "react";
+import { createRoleAPI } from "../../services/api.service";
+import ModuleApi from "./list.module.api.create";
 
 const RoleForm = (props) => {
 
@@ -12,11 +10,10 @@ const RoleForm = (props) => {
 
     const [isFormOpen, setIsFormOpen] = useState(false)
 
-    const { loadRole } = props
+    const { loadRole, listPermissions } = props
 
     const [form] = Form.useForm();
 
-    const [listPermissions, setListPermissions] = useState(null);
 
     const openNotificationWithIcon = (type, message, description) => {
         api[type]({
@@ -25,35 +22,11 @@ const RoleForm = (props) => {
         });
     };
 
-    useEffect(() => {
-        const init = async () => {
-            const res = await fetchAllPermissionsAPI(1, 100)
-            setListPermissions(groupByPermission(res.data.result))
-        }
-        init()
-    }, [])
-
-    const groupByPermission = (data) => {
-        const groupedData = data.reduce((acc, item) => {
-            acc[item.module] = acc[item.module] || [];
-            acc[item.module].push(item);
-            return acc;
-        }, {});
-        return Object.keys(groupedData).map((key) => ({
-            module: key,
-            permissions: groupedData[key],
-        }));
-    };
-
     const onFinish = async (values) => {
-        const subject = { id: values.subject }
-        const teacher = { telephone: values.teacher }
-        const campus = { id: values.campus }
 
-        dayjs.extend(customParseFormat)
-        const openDay = dayjs(values.openDay).format('YYYY-MM-DD')
+        const permissions = Object.keys(values.permissions).filter(key => values.permissions[key] === true && key.length === 36).map(x => ({ id: x }))
 
-        const res = await createClassAPI(values.name, subject, teacher, campus, openDay)
+        const res = await createRoleAPI(values.name, values.description, values.active, permissions)
         if (res.data) {
             openNotificationWithIcon('success', 'Thành công', 'Thêm mới vai trò thành công')
             await loadRole()
@@ -62,7 +35,6 @@ const RoleForm = (props) => {
         } else {
             openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
         }
-
     };
 
     return (
@@ -92,12 +64,12 @@ const RoleForm = (props) => {
                 }
                 okText="Thêm mới"
                 cancelText="Huỷ"
-                // footer={(_, { OkBtn, CancelBtn }) => (
-                //     <>
-                //         <OkBtn />
-                //         <CancelBtn />
-                //     </>
-                // )}
+                footer={(_, { OkBtn, CancelBtn }) => (
+                    <>
+                        <OkBtn />
+                        <CancelBtn />
+                    </>
+                )}
                 width={{
                     xs: '90%',
                     sm: '80%',
@@ -114,7 +86,6 @@ const RoleForm = (props) => {
                     layout="vertical"
                 >
                     <Row justify={"center"} style={{ marginTop: "20px" }}>
-
                         <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
                             <Form.Item style={{ width: "48%" }}
                                 label="Tên vai trò"
@@ -151,10 +122,9 @@ const RoleForm = (props) => {
                                 style={{ color: "#d81921", marginBottom: 20 }}
                                 variant="outlined"
                             >
-                                <ModuleApi form={form} listPermissions={listPermissions} />
+                                <ModuleApi form={form} listPermissions={listPermissions} dataUpdate={null} />
                             </Card>
                         </Col>
-
                     </Row>
                 </Form>
             </Modal >

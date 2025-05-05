@@ -1,8 +1,7 @@
-import { Col, DatePicker, Form, Input, Modal, notification, Row, Select } from "antd";
-import dayjs from "dayjs";
-import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { Card, Col, Form, Input, Modal, notification, Row, Switch } from "antd";
 import { useEffect } from "react";
-import { updateClassAPI } from "../../services/api.service";
+import { updateRoleAPI } from "../../services/api.service";
+import ModuleApi from "./list.module.api.create";
 
 
 const UpdateRoleModal = (props) => {
@@ -10,19 +9,32 @@ const UpdateRoleModal = (props) => {
     const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
     const [form] = Form.useForm()
 
-    const { isUpdateFormOpen, setIsUpdateFormOpen, loadClass, setDataUpdate, dataUpdate, campusOptions, subjectOptions } = props
+    const { isUpdateFormOpen, setIsUpdateFormOpen, loadRole, setDataUpdate, dataUpdate, listPermissions } = props
 
     useEffect(() => {
         if (dataUpdate) {
             form.setFieldValue("id", dataUpdate.id)
             form.setFieldValue("name", dataUpdate.name)
-            form.setFieldValue("teacher", dataUpdate.teacher.telephone)
-            form.setFieldValue("subject", dataUpdate.subject.id)
-            form.setFieldValue("campus", dataUpdate.campus.id)
+            form.setFieldValue("description", dataUpdate.description)
+            form.setFieldValue("active", dataUpdate.active)
 
-            const openDay = dayjs(dataUpdate.openDay)
-
-            form.setFieldValue("openDay", openDay)
+            if (dataUpdate && listPermissions) {
+                listPermissions.forEach((group) => {
+                    group.permissions.forEach((permission) => {
+                        const isChecked = dataUpdate.permissions.some((p) => p.id === permission.id);
+                        form.setFieldValue(["permissions", permission.id], isChecked);
+                    });
+                    const commonState = group.permissions.every(permission => form.getFieldValue(["permissions", permission.id]));
+                    form.setFieldValue(["permissions", group.module], commonState && true);
+                });
+            } else if (listPermissions) {
+                listPermissions.forEach((group) => {
+                    form.setFieldValue(["permissions", group.module], false);
+                    group.permissions.forEach((permission) => {
+                        form.setFieldValue(["permissions", permission.id], false);
+                    });
+                });
+            }
         }
     }, [dataUpdate])
 
@@ -34,32 +46,24 @@ const UpdateRoleModal = (props) => {
     };
 
     const onFinish = async (values) => {
-        const subject = { id: values.subject }
-        const teacher = { telephone: values.teacher }
-        const campus = { id: values.campus }
+        const permissions = Object.keys(values.permissions).filter(key => values.permissions[key] === true && key.length === 36).map(x => ({ id: x }))
 
-        dayjs.extend(customParseFormat)
-        const openDay = dayjs(values.openDay).format('YYYY-MM-DD')
-
-        const res = await updateClassAPI(values.id, values.name, subject, teacher, campus, openDay)
+        const res = await updateRoleAPI(values.id, values.name, values.description, values.active, permissions)
         if (res.data) {
-            openNotificationWithIcon('success', 'Thành công', 'Cập nhật lớp học thành công')
-            await loadClass()
+            openNotificationWithIcon('success', 'Thành công', 'Cập nhật vai trò thành công')
+            await loadRole()
             reloadAndCloseModal()
         } else {
             openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
         }
+
+        console.log("values form: ", values)
     };
 
     const reloadAndCloseModal = () => {
         setIsUpdateFormOpen(false)
         setDataUpdate(null)
     }
-
-    const formatterNumber = (val) => {
-        if (!val) return "0";
-        return Number(val).toLocaleString("en-US");
-    };
 
     return (
         <>
@@ -83,7 +87,7 @@ const UpdateRoleModal = (props) => {
                     sm: '80%',
                     md: '70%',
                     lg: '60%',
-                    xl: '50%',
+                    xl: '60%',
                     xxl: '40%',
                 }}
                 maskClosable={false}
@@ -95,7 +99,6 @@ const UpdateRoleModal = (props) => {
                 >
                     <Row justify={"center"} style={{ marginTop: "20px" }}>
                         <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
-
                             <Form.Item
                                 style={{ display: "none" }}
                                 name="id"
@@ -104,59 +107,42 @@ const UpdateRoleModal = (props) => {
                             </Form.Item>
 
                             <Form.Item style={{ width: "48%" }}
-                                label="Tên lớp học"
+                                label="Tên vai trò"
                                 name="name"
-                                rules={[{ required: true, message: 'Vui lòng điền tên lớp học !' }]}
+                                rules={[{ required: true, message: 'Vui lòng điền tên vai trò !' }]}
                             >
-                                <Input placeholder="Nhập tên lớp học" />
+                                <Input placeholder="Nhập tên vai trò" />
                             </Form.Item>
 
                             <Form.Item style={{ width: "48%" }}
-                                label="Dạy môn"
-                                name="subject"
-                                rules={[{ required: true, message: 'Vui lòng chọn môn dạy học !' }]}
+                                label="Trạng thái"
+                                name="active"
+                                valuePropName="checked"
+                                initialValue={dataUpdate?.active || true}
                             >
-                                <Select
-                                    placeholder="Chọn môn dạy học"
-                                    allowClear={true}
-                                    options={subjectOptions}
-                                >
-
-                                </Select>
+                                <Switch checkedChildren="ACTIVE" unCheckedChildren="INACTIVE" />
                             </Form.Item>
                         </Col>
 
-                        <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
-                            <Form.Item style={{ width: "48%" }}
-                                label="Số điện thoại giáo viên"
-                                name="teacher"
-                                rules={[{ required: true, message: 'Vui lòng điền số điện thoại của giáo viên !' }]}
+                        <Col span={24} style={{ display: "flex", justifyContent: "space-between" }}>
+                            <Form.Item style={{ width: "100%" }}
+                                label="Miêu tả"
+                                name="description"
+                                rules={[{ required: true, message: "Vui lòng không bỏ trống" }]}
                             >
-                                <Input placeholder="Nhập số điện thoại của giáo viên" />
-                            </Form.Item>
-
-                            <Form.Item style={{ width: "48%" }}
-                                label="Cơ sở"
-                                name="campus"
-                                rules={[{ required: true, message: 'Vui lòng chọn cơ sở dạy học !' }]}
-                            >
-                                <Select
-                                    placeholder="Chọn cơ sở dạy học"
-                                    allowClear={true}
-                                    options={campusOptions}
-                                >
-                                </Select>
+                                <Input.TextArea placeholder="Nhập miêu tả vai trò" autoSize={{ minRows: 2 }} />
                             </Form.Item>
                         </Col>
 
-                        <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
-                            <Form.Item style={{ width: "48%" }}
-                                label="Ngày khai giảng"
-                                name="openDay"
-                                rules={[{ required: true, message: 'Vui lòng chọn ngày khai giảng !' }]}
+                        <Col span={24}>
+                            <Card
+                                title="Quyền hạn"
+                                extra="Các quyền hạn được phép cho vai trò này"
+                                style={{ color: "#d81921", marginBottom: 20 }}
+                                variant="outlined"
                             >
-                                <DatePicker picker="date" format={"DD/MM/YYYY"} placeholder="DD/MM/YYYY" />
-                            </Form.Item>
+                                <ModuleApi form={form} listPermissions={listPermissions} dataUpdate={dataUpdate} />
+                            </Card>
                         </Col>
                     </Row>
                 </Form>
