@@ -138,8 +138,13 @@ const fetchAllSubjectsWithoutPaginationAPI = () => {
     return axios.get(URL_BACKEND)
 }
 
-const fetchAllSubjectsAPI = (page, pageSize) => {
-    const URL_BACKEND = `/subjects?page=${page}&size=${pageSize}`
+const fetchAllSubjectsAPI = (page, pageSize, filter = null) => {
+    let URL_BACKEND
+    if (filter) {
+        URL_BACKEND = `/subjects?page=${page}&size=${pageSize}&filter=${filter}`
+    } else {
+        URL_BACKEND = `/subjects?page=${page}&size=${pageSize}`
+    }
     return axios.get(URL_BACKEND)
 }
 
@@ -373,8 +378,45 @@ const fetchAllClassEnrollmentAPIWithoutPagination = (filter = null) => {
     return axios.get(URL_BACKEND)
 }
 
+//module user api
+const fetchAllUsersAPI = (page, pageSize, filter = null) => {
+    let URL_BACKEND
+    if (filter) {
+        URL_BACKEND = `/users?page=${page}&size=${pageSize}&filter=${filter}`
+    } else {
+        URL_BACKEND = `/users?page=${page}&size=${pageSize}`
+    }
+    return axios.get(URL_BACKEND)
+}
+
+const createUserAPI = (name, username, password, role) => {
+    const URL_BACKEND = "/users"
+    const data = {
+        name: name,
+        username: username,
+        password: password,
+        role: role
+    }
+    return axios.post(URL_BACKEND, data)
+}
+
+const updateUserAPI = (id, name, role) => {
+    const URL_BACKEND = "/users"
+    const data = {
+        id: id,
+        name: name,
+        role: role
+    }
+    return axios.put(URL_BACKEND, data)
+}
+
+const deleteUserAPI = (id) => {
+    const URL_BACKEND = `/users/${id}`
+    return axios.delete(URL_BACKEND)
+}
+
 
 export {
-    createCampusAPI, createClassAPI, createParentAPI, createRoleAPI, createScheduleAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteRoleAPI, deleteScheduleAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassEnrollmentAPIWithoutPagination, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllPermissionsAPI, fetchAllRolesAPI, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI, fetchAllTeachersAPI, fetchScheduleInWeek, getAccountAPI, getRefreshToken, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateRoleAPI, updateScheduleAPI, updateStudentAPI, updateSubjectAPI, updateTeacherAPI
+    createCampusAPI, createClassAPI, createParentAPI, createRoleAPI, createScheduleAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, createUserAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteRoleAPI, deleteScheduleAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, deleteUserAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassEnrollmentAPIWithoutPagination, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllPermissionsAPI, fetchAllRolesAPI, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI, fetchAllTeachersAPI, fetchAllUsersAPI, fetchScheduleInWeek, getAccountAPI, getRefreshToken, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateRoleAPI, updateScheduleAPI, updateStudentAPI, updateSubjectAPI, updateTeacherAPI, updateUserAPI
 };
 

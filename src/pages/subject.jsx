@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import SubjectForm from "../components/subject/create.subject.modal";
 import SubjectTable from "../components/subject/subject.table";
 import { fetchAllSubjectsAPI } from "../services/api.service";
@@ -10,13 +11,14 @@ const SubjectPage = () => {
     const [pageSize, setPageSize] = useState(10)
     const [total, setTotal] = useState(0)
 
+    const filter = useSelector((state) => state.search.subject)
 
     useEffect(() => {
         loadSubject()
-    }, [current, pageSize])
+    }, [current, pageSize, filter])
 
     const loadSubject = async () => {
-        const res = await fetchAllSubjectsAPI(current, pageSize)
+        const res = await fetchAllSubjectsAPI(current, pageSize, filter)
         if (res.data) {
             if (res.data.result.length === 0 && current > 1) {
                 setCurrent(res.data.meta.page - 1)

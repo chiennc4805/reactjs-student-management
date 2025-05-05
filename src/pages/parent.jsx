@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react"
+import { useSelector } from "react-redux"
 import ParentForm from "../components/parent/create.parent.modal"
 import ParentTable from "../components/parent/parent.table"
 import { fetchAllParentsAPI } from "../services/api.service"
-
-
 
 const ParentPage = () => {
 
@@ -12,13 +11,14 @@ const ParentPage = () => {
     const [pageSize, setPageSize] = useState(10)
     const [total, setTotal] = useState(0)
 
+    const filter = useSelector((state) => state.search.parent)
 
     useEffect(() => {
         loadParent()
-    }, [current, pageSize])
+    }, [current, pageSize, filter])
 
     const loadParent = async () => {
-        const res = await fetchAllParentsAPI(current, pageSize)
+        const res = await fetchAllParentsAPI(current, pageSize, filter)
         if (res.data) {
             if (res.data.result.length === 0 && current > 1) {
                 setCurrent(res.data.meta.page - 1)

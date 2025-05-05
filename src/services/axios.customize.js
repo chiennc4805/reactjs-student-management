@@ -43,6 +43,9 @@ instance.interceptors.response.use(
                 localStorage.setItem("access_token", res.data.access_token)
                 originalRequest.headers['Authorization'] = `Bearer ${res.data.access_token}`;
                 return instance(originalRequest); // Retry the original request
+            } else {
+                localStorage.removeItem("access_token");
+                window.location.href = "/login";
             }
         }
 

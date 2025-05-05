@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
 import {
 	createBrowserRouter,
 	RouterProvider,
@@ -18,6 +19,7 @@ import SubjectPage from './pages/subject.jsx';
 import TeacherPage from './pages/teacher.jsx';
 import UserPage from './pages/user.jsx';
 import Welcome from './pages/welcome.jsx';
+import store from './redux/store.js';
 import './styles/global.css';
 
 const router = createBrowserRouter([
@@ -84,6 +86,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
 	<AuthWrapper>
-		<RouterProvider router={router} />
+		<Provider store={store}>
+			<RouterProvider router={router} />
+		</Provider>
 	</AuthWrapper>
 )

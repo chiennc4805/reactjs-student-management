@@ -29,8 +29,6 @@ function App() {
 
 	const [scheduleMenuItems, setScheduleMenuItems] = useState([]);
 
-	const [searchConfig, setSearchConfig] = useState(null);
-
 	useEffect(() => {
 		fetchUserInfo()
 		fetchScheduleMenuItems()
@@ -231,10 +229,7 @@ function App() {
 							background: colorBgContainer,
 							borderRadius: borderRadiusLG,
 						}}>
-							<SearchBar
-								searchConfig={searchConfig}
-								setSearchConfig={setSearchConfig}
-							/>
+							<SearchBar />
 						</div>
 
 						<div

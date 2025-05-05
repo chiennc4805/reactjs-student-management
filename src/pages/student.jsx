@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import StudentForm from "../components/student/create.student.modal";
 import StudentTable from "../components/student/student.table";
 import { fetchAllClassesWithoutPaginationAPI, fetchAllStudentsAPI } from "../services/api.service";
@@ -11,9 +12,13 @@ const StudentPage = () => {
     const [total, setTotal] = useState(0)
     const [classOptions, setClassOptions] = useState([])
 
+    const filter = useSelector((state) => state.search.student)
+
+    console.log("filter: ", filter)
+
     useEffect(() => {
         loadStudent()
-    }, [current, pageSize])
+    }, [current, pageSize, filter])
 
     useEffect(() => {
         loadClassInForm()
@@ -25,7 +30,7 @@ const StudentPage = () => {
     }
 
     const loadStudent = async () => {
-        const res = await fetchAllStudentsAPI(current, pageSize)
+        const res = await fetchAllStudentsAPI(current, pageSize, filter)
         if (res.data) {
             if (res.data.result.length === 0 && current > 1) {
                 setCurrent(res.data.meta.page - 1)
