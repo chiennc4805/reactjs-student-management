@@ -1,52 +1,37 @@
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Modal, notification, Select } from 'antd';
-import { useState } from 'react';
-import { createScheduleAPI } from '../../services/api.service';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Modal, notification, Popconfirm, Select } from 'antd';
+import { useEffect, useState } from 'react';
+import { createScheduleAPI, deleteScheduleAPI, updateScheduleAPI } from '../../services/api.service';
 import '../../styles/createScheduleModal.css';
 
 const ScheduleForm = (props) => {
 
     const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
 
-    const [isFormOpen, setIsFormOpen] = useState(false)
+    const [isUpdateFormOpen, setIsUpdateFormOpen] = useState(false)
 
-    const { classOptions, fetchScheduleData } = props
+    const { fetchScheduleData, classData, isFormOpen, setIsFormOpen, weekdayList } = props
 
-    const [form] = Form.useForm();
+    const [formCreate] = Form.useForm();
+    const [formUpdate] = Form.useForm();
 
-    const slotOptions = [
-        { label: "Slot 1", value: 1 },
-        { label: "Slot 2", value: 2 },
-        { label: "Slot 3", value: 3 }
-    ]
+    useEffect(() => {
+        if (classData) {
+            formCreate.setFieldValue("classInfo", classData?.name || "");
+            formUpdate.setFieldValue("classInfo", classData?.name || "");
+            formUpdate.setFieldValue("weekdays", classData?.schedule?.weekdayList || []);
+        }
+    }, [classData])
 
     const weekdayOptions = [
-        { label: "Thứ 2", value: 2 },
-        { label: "Thứ 3", value: 3 },
-        { label: "Thứ 4", value: 4 },
-        { label: "Thứ 5", value: 5 },
-        { label: "Thứ 6", value: 6 },
-        { label: "Thứ 7", value: 7 },
-        { label: "Chủ nhật", value: 1 }
+        { label: "Thứ 2", value: 1 },
+        { label: "Thứ 3", value: 2 },
+        { label: "Thứ 4", value: 3 },
+        { label: "Thứ 5", value: 4 },
+        { label: "Thứ 6", value: 5 },
+        { label: "Thứ 7", value: 6 },
+        { label: "Chủ nhật", value: 0 }
     ]
-
-
-    const formItemLayout = {
-        labelCol: {
-            xs: { span: 24 },
-            sm: { span: 4 },
-        },
-        wrapperCol: {
-            xs: { span: 24 },
-            sm: { span: 20 },
-        },
-    };
-    const formItemLayoutWithOutLabel = {
-        wrapperCol: {
-            xs: { span: 24, offset: 0 },
-            sm: { span: 20, offset: 4 },
-        },
-    };
 
     const openNotificationWithIcon = (type, message, description) => {
         api[type]({
@@ -55,45 +40,38 @@ const ScheduleForm = (props) => {
         });
     };
 
-    const onFinish = async (values) => {
-        console.log('Received values of form:', values);
-
-        const classInfo = { id: values.classInfo };
-
-        const allSlotNumbers = [values.slotNumber, ...(values.listSchedule?.map(item => item.slotNumber) || [])];
-        const hasDuplicate = allSlotNumbers.some((slot, index) => allSlotNumbers.indexOf(slot) !== index);
-
-        if (hasDuplicate) {
-            openNotificationWithIcon('error', 'Thất bại', 'Có ca học bị trùng lặp. Vui lòng kiểm tra lại!');
-            return;
-        }
-
-        try {
-            let res = await createScheduleAPI(classInfo, values.slotNumber, values.weekday);
-            if (!res.data) {
-                openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message));
-                return;
-            }
-
-            if (values.listSchedule) {
-                for (const item of values.listSchedule) {
-                    res = await createScheduleAPI(classInfo, item.slotNumber, item.weekday);
-                    if (!res.data) {
-                        openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message));
-                        return;
-                    }
-                }
-            }
-
+    const onFinishCreate = async (values) => {
+        const res = await createScheduleAPI({ id: classData?.id }, values.weekdays);
+        if (res.data) {
             openNotificationWithIcon('success', 'Thành công', 'Thêm mới lịch học thành công');
             await fetchScheduleData();
             setIsFormOpen(false);
-            form.resetFields();
-        } catch (error) {
-            openNotificationWithIcon('error', 'Thất bại', 'Đã xảy ra lỗi trong quá trình xử lý!');
-            console.error(error);
+            formCreate.resetFields();
+        } else {
+            openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message));
         }
     };
+
+    const onFinishUpdate = async (values) => {
+        const res = await updateScheduleAPI(classData?.schedule?.id, { id: classData?.id }, values.weekdays);
+        if (res.data) {
+            openNotificationWithIcon('success', 'Thành công', 'Cập nhật lịch học thành công');
+            await fetchScheduleData();
+            setIsUpdateFormOpen(false);
+        } else {
+            openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message));
+        }
+    };
+
+    const handleDeleteSchedule = async () => {
+        const res = await deleteScheduleAPI(classData?.schedule?.id)
+        if (res.data) {
+            openNotificationWithIcon('success', 'Thành công', 'Xoá lịch học thành công');
+            await fetchScheduleData();
+        } else {
+            openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message));
+        }
+    }
 
     return (
         <>
@@ -104,21 +82,42 @@ const ScheduleForm = (props) => {
                     Lịch học
                 </h3>
 
-                <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={() => setIsFormOpen(true)}
-                >
-                    Thêm mới
-                </Button>
+                {weekdayList && (
+                    <div >
+                        <Button style={{ margin: "0px 10px" }}
+                            type='default'
+                            color='yellow'
+                            icon={<EditOutlined />}
+                            onClick={() => setIsUpdateFormOpen(true)}
+                        >
+                            Cập nhật
+                        </Button>
+
+                        <Popconfirm
+                            title="Xoá lịch học"
+                            description="Bạn chắc chắn xoá lịch học này?"
+                            onConfirm={() => handleDeleteSchedule()}
+                            okText="Có"
+                            cancelText="Không"
+                            placement='left'
+                        >
+                            <Button style={{ margin: "0px 0px 0px 10px" }}
+                                icon={<DeleteOutlined />}
+                                danger
+                            >
+                                Xoá
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                )}
             </div>
 
             <Modal
                 title="Thêm lịch học mới" open={isFormOpen}
-                onOk={() => form.submit()}
+                onOk={() => formCreate.submit()}
                 onCancel={() => {
                     setIsFormOpen(false);
-                    form.resetFields()
+                    formCreate.resetFields()
                 }
                 }
                 okText="Thêm mới"
@@ -140,118 +139,87 @@ const ScheduleForm = (props) => {
                 maskClosable={false}
             >
                 <Form
-                    form={form}
-                    onFinish={onFinish}
+                    form={formCreate}
+                    onFinish={onFinishCreate}
                     layout='vertical'
                 >
                     <Form.Item
                         label="Lớp học"
                         name="classInfo"
                         rules={[{ required: true, message: 'Vui lòng chọn lớp học !' }]}
-                        style={{ width: "93%" }}
+                    >
+                        <Input disabled />
+                    </Form.Item>
+
+
+                    <Form.Item
+                        label="Lịch học"
+                        name="weekdays"
+                        rules={[{ required: true, message: "Vui lòng chọn ngày trong tuần !" }]}
                     >
                         <Select
-                            placeholder="Chọn lớp học"
+                            mode='multiple'
+                            placeholder="Chọn ngày trong tuần"
                             allowClear={true}
-                            options={classOptions}
-                        >
-                        </Select>
+                            options={weekdayOptions}
+                        />
                     </Form.Item>
 
-                    <Form.Item label="Lịch học" style={{ marginBottom: "5px" }}>
-                        <Form.Item
-                            name="slotNumber"
-                            rules={[{ required: true, message: "Vui lòng chọn ca học !" }]}
-                            style={{
-                                display: 'inline-block',
-                                width: 'calc(44% - 8px)'
-                            }}
-                        >
-                            <Select
-                                placeholder="Chọn ca học"
-                                allowClear={true}
-                                options={slotOptions}
-                            />
-                        </Form.Item>
-                        <Form.Item
-                            name="weekday"
-                            rules={[{ required: true, message: "Vui lòng chọn ngày trong tuần !" }]}
-                            style={{
-                                display: 'inline-block',
-                                width: 'calc(50% - 8px)',
-                                margin: '0 8px',
-                            }}
-                        >
-                            <Select
-                                mode='multiple'
-                                placeholder="Chọn ngày trong tuần"
-                                allowClear={true}
-                                options={weekdayOptions}
-                            />
-                        </Form.Item>
+                </Form>
+            </Modal>
+
+            <Modal
+                title="Cập nhật lịch học"
+                open={isUpdateFormOpen}
+                onOk={() => formUpdate.submit()}
+                onCancel={() => {
+                    setIsUpdateFormOpen(false);
+                }}
+                okText="Cập nhật"
+                cancelText="Huỷ"
+                footer={(_, { OkBtn, CancelBtn }) => (
+                    <>
+                        <OkBtn />
+                        <CancelBtn />
+                    </>
+                )}
+                width={{
+                    xs: '90%',
+                    sm: '80%',
+                    md: '70%',
+                    lg: '60%',
+                    xl: '50%',
+                    xxl: '40%',
+                }}
+                maskClosable={false}
+            >
+                <Form
+                    form={formUpdate}
+                    onFinish={onFinishUpdate}
+                    layout='vertical'
+                >
+                    <Form.Item
+                        label="Lớp học"
+                        name="classInfo"
+                        rules={[{ required: true, message: 'Vui lòng chọn lớp học !' }]}
+                    >
+                        <Input disabled />
                     </Form.Item>
 
-                    <Form.List name="listSchedule">
-                        {(fields, { add, remove }, { errors }) => (
-                            <>
-                                {fields.map((field, index) => (
-                                    <Form.Item
-                                        required={false}
-                                        key={field.key}
-                                        style={{ marginBottom: "5px" }}
-                                    >
-                                        <Form.Item
-                                            {...field}
-                                            name={[field.name, "slotNumber"]} // Liên kết với từng phần tử
-                                            rules={[{ required: true, message: "Vui lòng chọn ca học!" }]}
-                                            style={{ display: 'inline-block', width: 'calc(44% - 8px)' }}
-                                        >
-                                            <Select
-                                                placeholder="Chọn ca học"
-                                                allowClear={true}
-                                                options={slotOptions}
-                                            />
-                                        </Form.Item>
-                                        <Form.Item
-                                            {...field}
-                                            name={[field.name, "weekday"]} // Liên kết với từng phần tử
-                                            rules={[{ required: true, message: "Vui lòng chọn ngày trong tuần!" }]}
-                                            style={{
-                                                display: 'inline-block',
-                                                width: 'calc(50% - 8px)',
-                                                margin: '0 8px',
-                                            }}
-                                        >
-                                            <Select
-                                                mode='multiple'
-                                                placeholder="Chọn ngày trong tuần"
-                                                allowClear={true}
-                                                options={weekdayOptions}
-                                            />
-                                        </Form.Item>
 
-                                        {fields.length > 0 ? (
-                                            <MinusCircleOutlined
-                                                className="dynamic-delete-button"
-                                                onClick={() => remove(field.name)}
-                                            />
-                                        ) : null}
-                                    </Form.Item>
-                                ))}
-                                <Form.Item>
-                                    <Button
-                                        type="dashed"
-                                        onClick={() => add()}
-                                        style={{ width: '20%', margin: "20px 0px 10px 0px" }}
-                                        icon={<PlusOutlined />}
-                                    >
-                                        Thêm ca học
-                                    </Button>
-                                    <Form.ErrorList errors={errors} />
-                                </Form.Item>
-                            </>
-                        )}
-                    </Form.List>
+                    <Form.Item
+                        label="Lịch học"
+                        name="weekdays"
+                        rules={[{ required: true, message: "Vui lòng chọn ngày trong tuần !" }]}
+                    >
+                        <Select
+                            mode='multiple'
+                            placeholder="Chọn ngày trong tuần"
+                            allowClear={true}
+                            options={weekdayOptions}
+                        />
+                    </Form.Item>
+
                 </Form>
             </Modal>
         </>

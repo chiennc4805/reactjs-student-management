@@ -1,78 +1,58 @@
-import { Tag } from 'antd';
-import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import ScheduleForm from '../components/schedule/create.schedule.modal';
 import ScheduleTable from '../components/schedule/schedule.table';
 import ViewScheduleDetail from '../components/schedule/view.schedule.modal';
-import { fetchAllClassesWithoutPaginationAPI, fetchScheduleInWeek } from '../services/api.service';
+import { fetchClassByName } from '../services/api.service';
 
 const SchedulePage = () => {
 
-    const [scheduleData, setScheduleData] = useState([]);
+    const { name } = useParams()
 
-    const [firstDayInWeek, setFirstDayInWeek] = useState(dayjs().day(1)); // Thứ 2
-
-    const [classOptions, setClassOptions] = useState([])
-
-    const [scheduleDetail, setScheduleDetail] = useState(null)
-    const [isDetailOpen, setIsDetailOpen] = useState(false)
+    const [classData, setClassData] = useState(null)
+    const [weekdayList, setWeekdayList] = useState(null)
+    const [rowData, setRowData] = useState(null)
+    const [isFormOpen, setIsFormOpen] = useState(false)
 
     useEffect(() => {
         fetchScheduleData()
-        loadClassInForm()
-    }, [])
+    }, [name])
 
-    const loadClassInForm = async () => {
-        const res = await fetchAllClassesWithoutPaginationAPI()
-        setClassOptions(res.data.result.map(c => ({ label: c.name, value: c.id })))
-    }
-
-    const renderScheduleItems = (items) => {
-        if (!items || items.length === 0) return '';
-
-        return (
-            <>
-                {items.map((item, index) => (
-                    <Tag key={index} onClick={() => alert("me")} style={{ cursor: "pointer" }}>
-                        {item.name}
-                    </Tag>
-                ))}
-            </>
-        );
-    };
 
     const fetchScheduleData = async () => {
+        setWeekdayList(null);
+        setRowData(null);
 
-        const res = await fetchScheduleInWeek(firstDayInWeek.format("YYYY-MM-DD"))
+        const res = await fetchClassByName(name)
 
-        const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        if (res.data) {
+            if (res.data.schedule) {
+                const data = res.data.students.map(s => (
+                    {
+                        studentName: s.name
+                    }
+                ))
+                setWeekdayList(res.data.schedule.weekdayList)
+                setRowData(data);
 
-        const data = res.data.map(rowData => {
-
-            // Thêm dữ liệu cho mỗi ngày trong tuần
-            weekdays.forEach(day => {
-                // Chuyển đổi dữ liệu lịch học thành các Tag
-                rowData[day] = renderScheduleItems(rowData[day]);
-            });
-
-            return rowData;
-        });
-
-        setScheduleData(data);
+            }
+            setClassData(res.data)
+        }
     };
 
     return (
         <>
             <ScheduleForm
-                classOptions={classOptions}
                 fetchScheduleData={fetchScheduleData}
+                classData={classData}
+                weekdayList={weekdayList}
+                isFormOpen={isFormOpen}
+                setIsFormOpen={setIsFormOpen}
             />
             <ScheduleTable
-                scheduleData={scheduleData}
-                setScheduleData={setScheduleData}
-                fetchScheduleData={fetchScheduleData}
-                firstDayInWeek={firstDayInWeek}
-                setFirstDayInWeek={setFirstDayInWeek}
+                weekdayList={weekdayList}
+                rowData={rowData}
+                setIsFormOpen={setIsFormOpen}
             />
             <ViewScheduleDetail />
         </>

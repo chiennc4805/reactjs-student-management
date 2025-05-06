@@ -50,7 +50,7 @@ function App() {
 					const classItems = resClassMenuItemsOfCampus.data && Array.isArray(resClassMenuItemsOfCampus.data.result)
 						? resClassMenuItemsOfCampus.data.result.map((item) => ({
 							key: `class${item.id}`,
-							label: item.name,
+							label: <Link to={`/schedule/${item.name}`}>{item.name}</Link>,
 						}))
 						: [];
 					return {
@@ -95,14 +95,6 @@ function App() {
 	};
 
 	const items = [
-		{
-			label: (
-				<a href="https://www.antgroup.com" target="_blank" rel="noopener noreferrer">
-					1st menu item
-				</a>
-			),
-			key: '0',
-		},
 		{
 			type: 'divider',
 		},

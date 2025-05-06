@@ -2,7 +2,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Form, Input, Modal, notification, Row, Switch } from "antd";
 import { useState } from "react";
 import { createRoleAPI } from "../../services/api.service";
-import ModuleApi from "./list.module.api.create";
+import ModuleApi from "./list.module.api";
 
 const RoleForm = (props) => {
 

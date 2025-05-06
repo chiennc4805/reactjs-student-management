@@ -1,4 +1,5 @@
 import { Breadcrumb, Col, Row, Table } from "antd";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchAllClassEnrollmentAPIWithoutPagination } from "../../services/api.service";
@@ -14,7 +15,7 @@ const ClassDetailPage = () => {
             if (!dataStudent) {
                 const res = await fetchAllClassEnrollmentAPIWithoutPagination(`enrollmentClass.name~'${name}'`)
                 if (res.data) {
-                    setDataStudent(res.data.result.map(x => x.enrollmentStudent))
+                    setDataStudent(res.data.result)
                 }
             }
         }
@@ -37,16 +38,21 @@ const ClassDetailPage = () => {
         {
             key: 'name',
             title: 'Name',
-            dataIndex: 'name',
+            render: (_, record) => {
+                return (
+                    <span>
+                        {record.enrollmentStudent?.name || ""}
+                    </span>
+                )
+            }
         },
         {
             key: "gender",
             title: 'Giới tính',
-            dataIndex: 'gender',
             render: (_, record) => {
                 return (
                     <span>
-                        {record.gender ? "Nam" : "Nữ"}
+                        {record.enrollmentStudent?.gender ? "Nam" : "Nữ"}
                     </span>
                 )
             }
@@ -54,12 +60,36 @@ const ClassDetailPage = () => {
         {
             key: 'height',
             title: 'Chiều cao (cm)',
-            dataIndex: 'height',
+            render: (_, record) => {
+                return (
+                    <span>
+                        {record.enrollmentStudent?.height}
+                    </span>
+                )
+            }
         },
         {
             key: 'weight',
             title: 'Cân nặng (kg)',
-            dataIndex: 'weight',
+            render: (_, record) => {
+                return (
+                    <span>
+                        {record.enrollmentStudent?.weight}
+                    </span>
+                )
+            }
+        },
+        {
+            key: 'date',
+            title: 'Ngày vào lớp',
+            dataIndex: 'date',
+            render: (_, record) => {
+                return (
+                    <span>
+                        {record.date ? dayjs(record.date).format("DD-MM-YYYY") : ""}
+                    </span>
+                )
+            }
         },
     ];
 
@@ -79,7 +109,7 @@ const ClassDetailPage = () => {
                         ]}
                         style={{ marginBottom: "20px" }}
                     />
-                    <Table columns={columns} dataSource={dataStudent} />
+                    <Table columns={columns} dataSource={dataStudent} pagination={false} />
                 </Col>
             </Row>
 

@@ -1,7 +1,7 @@
 import { Card, Col, Form, Input, Modal, notification, Row, Switch } from "antd";
 import { useEffect } from "react";
 import { updateRoleAPI } from "../../services/api.service";
-import ModuleApi from "./list.module.api.create";
+import ModuleApi from "./list.module.api";
 
 
 const UpdateRoleModal = (props) => {

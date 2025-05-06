@@ -36,7 +36,7 @@ const router = createBrowserRouter([
 				element: <StudentPage />
 			},
 			{
-				path: "schedule",
+				path: "schedule/:name",
 				element: <SchedulePage />
 			},
 			{
