@@ -52,7 +52,7 @@ const UpdateStudentModal = (props) => {
             const genderParent = values.parentGender === "1" ? true : false
             const resParentAPI = await createParentAPI(values.parentName, genderParent, birthDateParent, values.parentTelephone, values.parentAddress, values.parentZaloName, values.parentFacebookName)
             if (resParentAPI.data) {
-                openNotificationWithIcon('success', 'Thành công', 'Thêm mới phụ huynh thành công')
+                openNotificationWithIcon('success', 'Thành công', 'Cập nhật phụ huynh thành công')
             } else {
                 openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
                 return
@@ -66,7 +66,7 @@ const UpdateStudentModal = (props) => {
 
         const res = await updateStudentAPI(values.id, values.name, genderStudent, birthDateStudent, values.height, values.weight, classesStudent, parent)
         if (res.data) {
-            openNotificationWithIcon('success', 'Thành công', 'Thêm mới học sinh thành công')
+            openNotificationWithIcon('success', 'Thành công', 'Cập nhật học sinh thành công')
             await loadStudent()
         } else {
             openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))

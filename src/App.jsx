@@ -1,8 +1,9 @@
 import {
 	BankOutlined,
 	BugOutlined,
+	ClockCircleOutlined,
+	EnvironmentOutlined,
 	ExceptionOutlined,
-	HomeOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
 	ReadOutlined,
@@ -144,6 +145,19 @@ function App() {
 								icon: <ReadOutlined />
 							},
 							{
+								key: "campus",
+								label: "Cơ sở",
+								icon: <EnvironmentOutlined />,
+								children: [
+									{
+										label: <Link to="/campus">Thông tin</Link>
+									},
+									{
+										label: <Link to="/facility">Thiết bị</Link>
+									},
+								]
+							},
+							{
 								key: "class",
 								label: <Link to="/class">Lớp học</Link>,
 								icon: <BankOutlined />
@@ -155,15 +169,17 @@ function App() {
 								children: scheduleMenuItems
 							},
 							{
-								key: "campus",
-								label: "Cơ sở",
-								icon: <HomeOutlined />,
+								key: "attendance",
+								label: "Điểm danh",
+								icon: <ClockCircleOutlined />,
 								children: [
 									{
-										label: <Link to="/campus">Thông tin</Link>
+										key: "attendance1",
+										label: <Link to="/teacher-attendance">Giáo viên</Link>
 									},
 									{
-										label: <Link to="/facility">Thiết bị</Link>
+										key: "attendance2",
+										label: <Link to="/student-attendance">Học sinh</Link>
 									},
 								]
 							},

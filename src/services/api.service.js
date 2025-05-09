@@ -416,8 +416,19 @@ const deleteUserAPI = (id) => {
     return axios.delete(URL_BACKEND)
 }
 
+//module student attendance api
+const fetchAllStudentAttendance = (filter = null) => {
+    let URL_BACKEND
+    if (filter) {
+        URL_BACKEND = `/student-attendance?filter=${filter}`
+    } else {
+        URL_BACKEND = `/student-attendance`
+    }
+    return axios.get(URL_BACKEND)
+}
+
 
 export {
-    createCampusAPI, createClassAPI, createParentAPI, createRoleAPI, createScheduleAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, createUserAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteRoleAPI, deleteScheduleAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, deleteUserAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassEnrollmentAPIWithoutPagination, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllPermissionsAPI, fetchAllRolesAPI, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI, fetchAllTeachersAPI, fetchAllUsersAPI, fetchClassByName, fetchScheduleInWeek, getAccountAPI, getRefreshToken, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateRoleAPI, updateScheduleAPI, updateStudentAPI, updateSubjectAPI, updateTeacherAPI, updateUserAPI
+    createCampusAPI, createClassAPI, createParentAPI, createRoleAPI, createScheduleAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, createUserAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteRoleAPI, deleteScheduleAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, deleteUserAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassEnrollmentAPIWithoutPagination, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllPermissionsAPI, fetchAllRolesAPI, fetchAllStudentAttendance, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI, fetchAllTeachersAPI, fetchAllUsersAPI, fetchClassByName, fetchScheduleInWeek, getAccountAPI, getRefreshToken, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateRoleAPI, updateScheduleAPI, updateStudentAPI, updateSubjectAPI, updateTeacherAPI, updateUserAPI
 };
 
