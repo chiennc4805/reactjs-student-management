@@ -1,44 +1,49 @@
-import { Breadcrumb, Button, Radio, Table, Tabs } from "antd";
+import { Breadcrumb, Button, Form, notification, Radio, Table, Tabs } from "antd";
 import dayjs from "dayjs";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchAllStudentAttendance } from "../../services/api.service";
+import { fetchAllStudentAttendance, updateStudentAttendance } from "../../services/api.service";
 
 const CheckInStudentAttendancePage = () => {
+    const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
     const { className } = useParams();
     const [activeKey, setActiveKey] = useState("1");
     const [studentData, setStudentData] = useState([]); // Lưu trữ dữ liệu gốc
-    const [radioValues, setRadioValues] = useState({}); // Lưu trữ giá trị radio cho từng hàng
-    const newTabIndex = useRef(0);
+    const [form] = Form.useForm();
+
+    const openNotificationWithIcon = (type, message, description) => {
+        api[type]({
+            message: message,
+            description: description
+        });
+    };
 
     useEffect(() => {
         fetchStudentAttendanceInClass();
     }, []);
 
-    // Tách các cột của bảng ra để tránh vấn đề re-render
     const columnsTable = [
         {
             title: 'STT',
-            dataIndex: "stt",
-            render: (_, record, index) => <span>{index + 1}</span>
+            render: (_, record, index) => <span>{index + 1}</span>,
         },
         {
             title: "Tên học sinh",
-            render: (_, record) => <span>{record.student.name}</span>
+            render: (_, record) => <span>{record.student.name}</span>,
         },
         {
             title: "Trạng thái",
             render: (_, record) => (
-                <Radio.Group
-                    onChange={(e) => onChangeRadio(e, record)}
-                    value={radioValues[record.key]}
-                    name={`attendance-${record.key}`}
+                <Form.Item
+                    name={['students', record.key, 'status']}
                 >
-                    <Radio value={true}>Có mặt</Radio>
-                    <Radio value={false}>Vắng mặt</Radio>
-                </Radio.Group>
-            )
-        }
+                    <Radio.Group>
+                        <Radio value={true}>Có mặt</Radio>
+                        <Radio value={false}>Vắng mặt</Radio>
+                    </Radio.Group>
+                </Form.Item>
+            ),
+        },
     ];
 
     const groupBySlot = (data) => {
@@ -58,36 +63,27 @@ const CheckInStudentAttendancePage = () => {
             const res = await fetchAllStudentAttendance(`date~'${dayjs().format('YYYY-MM-DD')}' and classInfo.name~'${className}'`);
             if (res.data && res.data.result.length) {
                 const groupSlot = groupBySlot(res.data.result);
+                console.log("groupSlot: ", groupSlot)
                 setStudentData(groupSlot);
 
-                // Khởi tạo radioValues với trạng thái điểm danh hiện có
-                const initialValues = {};
-                groupSlot.forEach(slotGroup => {
-                    slotGroup.students.forEach((student, index) => {
-                        const key = `${slotGroup.slot}-${index}`;
-                        initialValues[key] = student.status !== undefined ? student.status : null;
-                    });
-                });
-                setRadioValues(initialValues);
+                // Thiết lập giá trị cho form
+                const initialValues = {
+                    students: groupSlot.reduce((acc, slotGroup) => {
+                        slotGroup.students.forEach(student => {
+                            acc[student.id] = { status: student.status };
+                        });
+                        return acc;
+                    }, {}),
+                };
+                form.setFieldsValue(initialValues);
             }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu điểm danh:", error);
         }
     };
 
-    const onChangeRadio = (e, record) => {
-        const value = e.target.value;
-        setRadioValues(prev => {
-            const newValues = { ...prev, [record.key]: value };
-            console.log("Đã cập nhật giá trị radio:", newValues);
-            return newValues;
-        });
-    };
-
-    // Tạo items cho Tabs dựa trên studentData và radioValues
     const getTabItems = () => {
         if (!studentData.length) return [];
-
         return studentData.map((slotGroup) => ({
             label: `Ca ${slotGroup.slot}`,
             key: slotGroup.slot.toString(),
@@ -95,97 +91,91 @@ const CheckInStudentAttendancePage = () => {
             children: (
                 <Table
                     columns={columnsTable}
-                    dataSource={slotGroup.students.map((student, index) => {
-                        const key = `${slotGroup.slot}-${index}`;
-                        return {
-                            ...student,
-                            key: key,
-                        };
-                    })}
+                    dataSource={slotGroup.students.map((student, index) => ({
+                        ...student,
+                        key: `${student.id}`, // Tạo key duy nhất cho từng hàng
+                    }))}
                     pagination={false}
-                    rowKey={record => record.key}
+                    rowKey="key"
                 />
-            )
+            ),
         }));
+    };
+
+    const onFinish = async (values) => {
+        // Xử lý dữ liệu hoặc gửi lên API
+        const reqData = Object.keys(values.students).map(sID => ({
+            studentAttendanceId: sID,
+            status: values.students[sID].status
+        }))
+        console.log("req data: ", reqData)
+        const res = await updateStudentAttendance(reqData)
+        if (res.data) {
+            console.log("resData: ", res.data)
+            openNotificationWithIcon('success', 'Thành công', 'Điểm danh thành công')
+        } else {
+            openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
+        }
     };
 
     const onChangeTab = (newActiveKey) => {
         setActiveKey(newActiveKey);
     };
 
-    const add = () => {
-        const newActiveKey = `newTab${newTabIndex.current++}`;
-        const newPanes = [...items];
-        newPanes.push({
-            label: 'Tab mới',
-            children: 'Nội dung của tab mới',
-            key: newActiveKey
-        });
-        setItems(newPanes);
-        setActiveKey(newActiveKey);
-    };
-
-    const remove = (targetKey) => {
-        let newActiveKey = activeKey;
-        let lastIndex = -1;
-        const items = getTabItems();
-        items.forEach((item, i) => {
-            if (item.key === targetKey) {
-                lastIndex = i - 1;
-            }
-        });
-        const newPanes = items.filter(item => item.key !== targetKey);
-        if (newPanes.length && newActiveKey === targetKey) {
-            if (lastIndex >= 0) {
-                newActiveKey = newPanes[lastIndex].key;
-            } else {
-                newActiveKey = newPanes[0].key;
-            }
-        }
-        setActiveKey(newActiveKey);
-        // Cập nhật lại studentData sau khi xóa tab
-        setStudentData(prevData =>
-            prevData.filter(group => group.slot.toString() !== targetKey)
-        );
-    };
-
-    const onEdit = (targetKey, action) => {
-        if (action === 'add') {
-            add();
-        } else {
-            remove(targetKey);
-        }
-    };
-
-    // Lấy items động từ studentData và radioValues
     const items = getTabItems();
 
     return (
-        <div style={{ margin: "1%" }}>
-            <Breadcrumb
-                style={{ marginBottom: "20px" }}
-                items={[
-                    {
-                        title: <Link to="/student-attendance" style={{ marginTop: "2px" }}>Điểm danh {dayjs().format("DD/MM")}</Link>,
-                    },
-                    {
-                        title: <h3>{className}</h3>,
-                    },
-                ]}
-            />
-            <Tabs
-                type="editable-card"
-                onChange={onChangeTab}
-                activeKey={activeKey}
-                onEdit={onEdit}
-                items={items}
-            />
-            <div style={{ display: "flex", justifyContent: "end", margin: "20px" }}>
-                <Button type="primary">
-                    Lưu
-                </Button>
+        <>
+            {contextHolder}
+
+            <div style={{ margin: "1%" }}>
+                <Breadcrumb
+                    style={{ marginBottom: "20px" }}
+                    items={[
+                        {
+                            title: <Link to="/student-attendance" style={{ marginTop: "2px" }}>Điểm danh {dayjs().format("DD/MM")}</Link>,
+                        },
+                        {
+                            title: <h3>{className}</h3>,
+                        },
+                    ]}
+                />
+                <Form
+                    form={form}
+                    onFinish={onFinish}
+                >
+                    <Form.Item
+                        style={{ display: "none" }}
+                        name="className"
+                        initialValue={className}
+                    >
+                    </Form.Item>
+                    <Form.Item
+                        style={{ display: "none" }}
+                        name="date"
+                        initialValue={dayjs().format("YYYY-MM-DD")}
+                    >
+                    </Form.Item>
+                    <Form.Item
+                        style={{ display: "none" }}
+                        name="slot"
+                        initialValue={activeKey}
+                    >
+                    </Form.Item>
+                    <Tabs
+                        type="editable-card"
+                        onChange={onChangeTab}
+                        activeKey={activeKey}
+                        items={items}
+                    />
+                    <div style={{ display: "flex", justifyContent: "end", margin: "20px" }}>
+                        <Button type="primary" htmlType="submit">
+                            Lưu
+                        </Button>
+                    </div>
+                </Form>
             </div>
-        </div>
+        </>
     );
 };
 
