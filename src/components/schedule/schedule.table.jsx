@@ -1,13 +1,15 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Col, ConfigProvider, DatePicker, Divider, Result, Row, Table } from 'antd';
 import viVN from 'antd/es/locale/vi_VN';
 import dayjs from "dayjs";
 import 'dayjs/locale/vi';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { useEffect, useState } from 'react';
+import { fetchAllStudentAttendance } from '../../services/api.service';
 
 const ScheduleTable = (props) => {
 
-    const { weekdayList, rowData, setIsFormOpen } = props
+    const { weekdayList, rowData, setIsFormOpen, classData, setRowData } = props
 
     const [columns, setColumns] = useState([])
 
@@ -32,7 +34,7 @@ const ScheduleTable = (props) => {
         }
     }
 
-    const onChangeMonth = (date) => {
+    const onChangeMonth = async (date) => {
         let chosenMonth;
         let firstDayInMonth;
         let newColumns = []
@@ -47,6 +49,27 @@ const ScheduleTable = (props) => {
 
         for (let i = firstDayInMonth; i.month() === chosenMonth; i = i.add(1, 'day')) {
             if (weekdayList?.includes(i.day())) {
+                dayjs.extend(isSameOrAfter);
+                if (dayjs().isSameOrAfter(i, 'day')) {
+                    const res = await fetchAllStudentAttendance(`date='${i.format('YYYY-MM-DD')}' and classInfo.name='${classData?.name}'`)
+                    if (res.data && res.data.result.length) {
+                        console.log("res data: ", res.data)
+                        const data = res.data.result.filter(item => item.statusOfClass === true)
+                        const newRowData = rowData.map(row => {
+                            const statusOfSlot = data
+                                .filter(x => x.student.id === row.sId)
+                                .sort((a, b) => a.slot - b.slot)
+                                .map(x => x.status);
+
+                            return {
+                                ...row,
+                                [i.format("YYYY-MM-DD")]: statusOfSlot.length > 0 ? statusOfSlot : [],
+                            };
+                        });
+                        console.log("new row data: ", newRowData)
+                        setRowData(newRowData);
+                    }
+                }
                 newColumns.push(
                     {
                         title: (
@@ -58,7 +81,13 @@ const ScheduleTable = (props) => {
                         ),
                         dataIndex: i.format("YYYY-MM-DD"),
                         key: i.format("YYYY-MM-DD"),
-                        render: (text) => text || ''
+                        render: (text) => (
+                            <>
+                                {text && text.map((i, index) => (
+                                    <span key={index}>{i ? <CheckOutlined /> : <CloseOutlined />}</span>
+                                ))}
+                            </>
+                        )
                     }
                 )
             }

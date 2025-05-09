@@ -11,8 +11,8 @@ import {
 	TeamOutlined,
 	UserOutlined
 } from '@ant-design/icons';
-import { Avatar, Button, Dropdown, Layout, Menu, theme } from 'antd';
-import React, { useContext, useEffect, useState } from 'react';
+import { Avatar, Button, Dropdown, Layout, Menu, message, theme } from 'antd';
+import { useContext, useEffect, useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { AuthContext } from './components/context/auth.context';
 import SearchBar from './components/layout/search.bar';

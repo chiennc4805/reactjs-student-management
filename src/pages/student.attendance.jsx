@@ -1,4 +1,4 @@
-import { Table } from "antd";
+import { Table, Tag } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -15,10 +15,12 @@ const StudentAttendancePage = () => {
     const itemsInTable = async () => {
         const res = await fetchAllStudentAttendance(`date~'${dayjs().format("YYYY-MM-DD")}'`)
         if (res.data && res.data.result.length) { //res.data.result : array
+            console.log("sa res: ", res.data.result)
             const setClassName = new Set(res.data.result.map(item => item.classInfo.name))
             const items = Array.from(setClassName).map((className, index) => ({
                 key: String(index + 1),
-                name: className
+                name: className,
+                status: res.data.result.filter(item => item.classInfo.name === className).every(item => item.statusOfClass)
             }
             ))
             setTableItems(items);
@@ -41,6 +43,14 @@ const StudentAttendancePage = () => {
             title: 'Tên lớp',
             dataIndex: 'name',
             key: 'name',
+        },
+        {
+            key: "status",
+            title: 'Trạng thái',
+            dataIndex: 'status',
+            render: (status) => (
+                <Tag color={status ? 'success' : 'error'}>{status ? "Đã điểm danh" : "Chưa điểm danh"}</Tag>
+            )
         },
 
     ]

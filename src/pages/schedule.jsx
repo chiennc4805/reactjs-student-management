@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ScheduleForm from '../components/schedule/create.schedule.modal';
 import ScheduleTable from '../components/schedule/schedule.table';
-import ViewScheduleDetail from '../components/schedule/view.schedule.modal';
 import { fetchClassByName } from '../services/api.service';
 
 const SchedulePage = () => {
@@ -29,14 +28,19 @@ const SchedulePage = () => {
             if (res.data.schedule) {
                 const data = res.data.students.map(s => (
                     {
+                        sId: s.id,
                         studentName: s.name
                     }
                 ))
                 setWeekdayList(res.data.schedule.weekdayList)
                 setRowData(data);
+                console.log("weekday list: ", res.data.schedule.weekdayList)
+                console.log("row data: ", data)
 
             }
             setClassData(res.data)
+            console.log("class data: ", res.data)
+
         }
     };
 
@@ -53,8 +57,9 @@ const SchedulePage = () => {
                 weekdayList={weekdayList}
                 rowData={rowData}
                 setIsFormOpen={setIsFormOpen}
+                classData={classData}
+                setRowData={setRowData}
             />
-            <ViewScheduleDetail />
         </>
     )
 };
