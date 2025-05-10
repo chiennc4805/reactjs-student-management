@@ -10,7 +10,7 @@ const RoleForm = (props) => {
 
     const [isFormOpen, setIsFormOpen] = useState(false)
 
-    const { loadRole, listPermissions } = props
+    const { loadRole, listAllPermissions } = props
 
     const [form] = Form.useForm();
 
@@ -122,7 +122,7 @@ const RoleForm = (props) => {
                                 style={{ color: "#d81921", marginBottom: 20 }}
                                 variant="outlined"
                             >
-                                <ModuleApi form={form} listPermissions={listPermissions} dataUpdate={null} />
+                                <ModuleApi form={form} listAllPermissions={listAllPermissions} dataUpdate={null} />
                             </Card>
                         </Col>
                     </Row>

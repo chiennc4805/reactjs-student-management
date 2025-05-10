@@ -10,7 +10,7 @@ const RoleTable = (props) => {
     const [api, contextHolder] = notification.useNotification();
 
     const { dataRoles, loadRole, pageSize, setPageSize,
-        current, setCurrent, total, listPermissions } = props
+        current, setCurrent, total, listAllPermissions } = props
 
     const [dataUpdate, setDataUpdate] = useState(null)
     const [isUpdateFormOpen, setIsUpdateFormOpen] = useState(false)
@@ -144,7 +144,7 @@ const RoleTable = (props) => {
                 setIsUpdateFormOpen={setIsUpdateFormOpen}
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
-                listPermissions={listPermissions}
+                listAllPermissions={listAllPermissions}
             />
         </>
 

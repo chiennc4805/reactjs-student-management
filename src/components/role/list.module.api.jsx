@@ -1,10 +1,9 @@
 import { Card, Col, Collapse, Form, Row, Switch, Tooltip } from "antd";
-import React from "react";
 
-const ModuleApi = ({ form, listPermissions, dataUpdate }) => {
+const ModuleApi = ({ form, listAllPermissions, dataUpdate }) => {
 
     const handleSwitchAll = (checked, name) => {
-        const child = listPermissions?.find((item) => item.module === name);
+        const child = listAllPermissions?.find((item) => item.module === name);
         if (child) {
             child?.permissions?.forEach((item) => {
                 if (item.id) form.setFieldValue(["permissions", item.id], checked);
@@ -17,7 +16,7 @@ const ModuleApi = ({ form, listPermissions, dataUpdate }) => {
         form.setFieldValue(["permissions", child], value);
 
         // Check all
-        const group = listPermissions?.find((item) => item.module === parent);
+        const group = listAllPermissions?.find((item) => item.module === parent);
         if (group?.module) {
             const restPermission = group?.permissions?.filter((item) => item.id !== child);
             if (restPermission && restPermission.length) {
@@ -29,7 +28,7 @@ const ModuleApi = ({ form, listPermissions, dataUpdate }) => {
         }
     };
 
-    const collapseItems = listPermissions?.map((groupPermission, groupIndex) => ({
+    const collapseItems = listAllPermissions?.map((groupPermission, groupIndex) => ({
         key: groupIndex.toString(),
         label: <div>{groupPermission.module}</div>,
         extra: (

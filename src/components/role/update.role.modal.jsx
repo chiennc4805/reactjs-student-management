@@ -9,7 +9,7 @@ const UpdateRoleModal = (props) => {
     const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
     const [form] = Form.useForm()
 
-    const { isUpdateFormOpen, setIsUpdateFormOpen, loadRole, setDataUpdate, dataUpdate, listPermissions } = props
+    const { isUpdateFormOpen, setIsUpdateFormOpen, loadRole, setDataUpdate, dataUpdate, listAllPermissions } = props
 
     useEffect(() => {
         if (dataUpdate) {
@@ -17,25 +17,26 @@ const UpdateRoleModal = (props) => {
             form.setFieldValue("name", dataUpdate.name)
             form.setFieldValue("description", dataUpdate.description)
             form.setFieldValue("active", dataUpdate.active)
-
-            if (dataUpdate && listPermissions) {
-                listPermissions.forEach((group) => {
-                    group.permissions.forEach((permission) => {
-                        const isChecked = dataUpdate.permissions.some((p) => p.id === permission.id);
-                        form.setFieldValue(["permissions", permission.id], isChecked);
-                    });
-                    const commonState = group.permissions.every(permission => form.getFieldValue(["permissions", permission.id]));
-                    form.setFieldValue(["permissions", group.module], commonState && true);
-                });
-            } else if (listPermissions) {
-                listPermissions.forEach((group) => {
-                    form.setFieldValue(["permissions", group.module], false);
-                    group.permissions.forEach((permission) => {
-                        form.setFieldValue(["permissions", permission.id], false);
-                    });
-                });
-            }
         }
+
+        if (dataUpdate && listAllPermissions) {
+            listAllPermissions.forEach((group) => {
+                group.permissions.forEach((permission) => {
+                    const isChecked = dataUpdate.permissions.some((p) => p.id === permission.id);
+                    form.setFieldValue(["permissions", permission.id], isChecked);
+                });
+                const commonState = group.permissions.every(permission => form.getFieldValue(["permissions", permission.id]));
+                form.setFieldValue(["permissions", group.module], commonState && true);
+            });
+        } else if (listAllPermissions) {
+            listAllPermissions.forEach((group) => {
+                form.setFieldValue(["permissions", group.module], false);
+                group.permissions.forEach((permission) => {
+                    form.setFieldValue(["permissions", permission.id], false);
+                });
+            });
+        }
+
     }, [dataUpdate])
 
     const openNotificationWithIcon = (type, message, description) => {
@@ -141,7 +142,7 @@ const UpdateRoleModal = (props) => {
                                 style={{ color: "#d81921", marginBottom: 20 }}
                                 variant="outlined"
                             >
-                                <ModuleApi form={form} listPermissions={listPermissions} dataUpdate={dataUpdate} />
+                                <ModuleApi form={form} listAllPermissions={listAllPermissions} dataUpdate={dataUpdate} />
                             </Card>
                         </Col>
                     </Row>

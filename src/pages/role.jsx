@@ -9,7 +9,7 @@ const RolePage = () => {
     const [current, setCurrent] = useState(1)
     const [pageSize, setPageSize] = useState(10)
     const [total, setTotal] = useState(0)
-    const [listPermissions, setListPermissions] = useState(null);
+    const [listAllPermissions, setlistAllPermissions] = useState(null);
 
     useEffect(() => {
         loadRole()
@@ -18,7 +18,7 @@ const RolePage = () => {
     useEffect(() => {
         const init = async () => {
             const res = await fetchAllPermissionsAPI(1, 100)
-            setListPermissions(groupByPermission(res.data.result))
+            setlistAllPermissions(groupByPermission(res.data.result))
         }
         init()
     }, [])
@@ -51,7 +51,7 @@ const RolePage = () => {
         <>
             <RoleForm
                 loadRole={loadRole}
-                listPermissions={listPermissions}
+                listAllPermissions={listAllPermissions}
             />
             <RoleTable
                 dataRoles={dataRoles}
@@ -61,7 +61,7 @@ const RolePage = () => {
                 pageSize={pageSize}
                 setPageSize={setPageSize}
                 total={total}
-                listPermissions={listPermissions}
+                listAllPermissions={listAllPermissions}
             />
         </>
     )
