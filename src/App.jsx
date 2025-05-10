@@ -170,18 +170,8 @@ function App() {
 							},
 							{
 								key: "attendance",
-								label: "Điểm danh",
+								label: <Link to="/attendance">Điểm danh</Link>,
 								icon: <ClockCircleOutlined />,
-								children: [
-									{
-										key: "attendance1",
-										label: <Link to="/teacher-attendance">Giáo viên</Link>
-									},
-									{
-										key: "attendance2",
-										label: <Link to="/student-attendance">Học sinh</Link>
-									},
-								]
 							},
 							{
 								key: "user",

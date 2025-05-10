@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchAllStudentAttendance } from "../services/api.service";
 
-const StudentAttendancePage = () => {
+const AttendancePage = () => {
 
     const [tableItem, setTableItems] = useState([]);
 
@@ -15,7 +15,6 @@ const StudentAttendancePage = () => {
     const itemsInTable = async () => {
         const res = await fetchAllStudentAttendance(`date~'${dayjs().format("YYYY-MM-DD")}'`)
         if (res.data && res.data.result.length) { //res.data.result : array
-            console.log("sa res: ", res.data.result)
             const setClassName = new Set(res.data.result.map(item => item.classInfo.name))
             const items = Array.from(setClassName).map((className, index) => ({
                 key: String(index + 1),
@@ -33,7 +32,7 @@ const StudentAttendancePage = () => {
             title: 'STT',
             render: (_, record, index) => {
                 return (
-                    <Link to={`/student-attendance/${record.name}`}>
+                    <Link to={`/attendance/${record.name}`}>
                         {(index + 1)}
                     </Link>
                 )
@@ -71,4 +70,4 @@ const StudentAttendancePage = () => {
     )
 }
 
-export default StudentAttendancePage;
+export default AttendancePage;

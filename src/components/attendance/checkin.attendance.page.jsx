@@ -104,9 +104,7 @@ const CheckInStudentAttendancePage = () => {
             const res = await fetchAllStudentAttendance(`date~'${dayjs().format('YYYY-MM-DD')}' and classInfo.name~'${className}'`);
             if (res.data && res.data.result.length) {
                 const groupSlot = groupBySlot(res.data.result);
-                console.log("res from fetch all: ", res.data.result)
                 setStudentData(groupSlot);
-                console.log("group slot: ", groupSlot)
 
                 const initialValues = {
                     studentAttendances: groupSlot.reduce((acc, slotGroup) => {
@@ -170,7 +168,7 @@ const CheckInStudentAttendancePage = () => {
                     style={{ marginBottom: "20px" }}
                     items={[
                         {
-                            title: <Link to="/student-attendance" style={{ marginTop: "2px" }}>Điểm danh {dayjs().format("DD/MM")}</Link>,
+                            title: <Link to="/attendance" style={{ marginTop: "2px" }}>Điểm danh {dayjs().format("DD/MM")}</Link>,
                         },
                         {
                             title: <h3>{className}</h3>,

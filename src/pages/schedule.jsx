@@ -34,13 +34,10 @@ const SchedulePage = () => {
                 ))
                 setWeekdayList(res.data.schedule.weekdayList)
                 setRowData(data);
-                console.log("weekday list: ", res.data.schedule.weekdayList)
                 console.log("row data: ", data)
 
             }
             setClassData(res.data)
-            console.log("class data: ", res.data)
-
         }
     };
 

@@ -3,7 +3,6 @@ import { Button, Col, ConfigProvider, DatePicker, Divider, Result, Row, Table } 
 import viVN from 'antd/es/locale/vi_VN';
 import dayjs from "dayjs";
 import 'dayjs/locale/vi';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { useEffect, useState } from 'react';
 import { fetchAllStudentAttendance } from '../../services/api.service';
 
@@ -15,6 +14,7 @@ const ScheduleTable = (props) => {
 
     useEffect(() => {
         if (weekdayList) {
+            console.log("rowData first time: ", rowData)
             onChangeMonth()
         }
     }, [weekdayList]);
@@ -38,10 +38,10 @@ const ScheduleTable = (props) => {
         let chosenMonth;
         let firstDayInMonth;
         let newColumns = []
+
         if (!date) {
             chosenMonth = dayjs().month()
             firstDayInMonth = dayjs().startOf("month")
-
         } else {
             chosenMonth = date.month()
             firstDayInMonth = date.startOf("month")
@@ -49,52 +49,67 @@ const ScheduleTable = (props) => {
 
         for (let i = firstDayInMonth; i.month() === chosenMonth; i = i.add(1, 'day')) {
             if (weekdayList?.includes(i.day())) {
-                dayjs.extend(isSameOrAfter);
-                if (dayjs().isSameOrAfter(i, 'day')) {
-                    const res = await fetchAllStudentAttendance(`date='${i.format('YYYY-MM-DD')}' and classInfo.name='${classData?.name}'`)
-                    if (res.data && res.data.result.length) {
-                        console.log("res data: ", res.data)
-                        const data = res.data.result.filter(item => item.statusOfClass === true)
-                        const newRowData = rowData.map(row => {
-                            const statusOfSlot = data
-                                .filter(x => x.student.id === row.sId)
-                                .sort((a, b) => a.slot - b.slot)
-                                .map(x => x.status);
-
-                            return {
-                                ...row,
-                                [i.format("YYYY-MM-DD")]: statusOfSlot.length > 0 ? statusOfSlot : [],
-                            };
-                        });
-                        console.log("new row data: ", newRowData)
-                        setRowData(newRowData);
-                    }
-                }
-                newColumns.push(
-                    {
-                        title: (
-                            <>
-                                {convertWeekdayToVietnamese(i)}
-                                <Divider style={{ margin: '8px 0' }} />
-                                {i.format("DD/MM")}
-                            </>
-                        ),
-                        dataIndex: i.format("YYYY-MM-DD"),
-                        key: i.format("YYYY-MM-DD"),
-                        render: (text) => (
+                newColumns.push({
+                    title: (
+                        <>
+                            {convertWeekdayToVietnamese(i)}
+                            <Divider style={{ margin: '8px 0' }} />
+                            {i.format("DD/MM")}
+                        </>
+                    ),
+                    dataIndex: i.format("YYYY-MM-DD"),
+                    key: i.format("YYYY-MM-DD"),
+                    render: (text) => {
+                        return (
                             <>
                                 {text && text.map((i, index) => (
                                     <span key={index}>{i ? <CheckOutlined /> : <CloseOutlined />}</span>
                                 ))}
                             </>
-                        )
+                        );
                     }
-                )
+                });
+            }
+        }
+        setColumns([studentColumn, ...newColumns]);
+
+        const daysToFetch = [];
+        for (let i = firstDayInMonth; i.month() === chosenMonth; i = i.add(1, 'day')) {
+            if (weekdayList?.includes(i.day()) && dayjs().isSameOrAfter(i, 'day')) {
+                daysToFetch.push(i.clone());
             }
         }
 
-        setColumns([studentColumn, ...newColumns])
+        let newRowData = [...rowData];
 
+        for (const day of daysToFetch) {
+            const dateString = day.format('YYYY-MM-DD');
+
+            const res = await fetchAllStudentAttendance(`date='${dateString}' and classInfo.name='${classData?.name}'`);
+
+            if (res.data && res.data.result.length) {
+                const data = res.data.result.filter(item => item.statusOfClass === true);
+                if (data.length === 0) {
+                    continue;
+                }
+
+                newRowData = newRowData.map(row => {
+                    const statusOfSlot = data
+                        .filter(x => x.student.id === row.sId)
+                        .sort((a, b) => a.slot - b.slot)
+                        .map(x => x.status);
+
+                    if (statusOfSlot.length > 0) {
+                        return {
+                            ...row,
+                            [dateString]: statusOfSlot
+                        };
+                    }
+                    return row;
+                });
+            }
+        }
+        setRowData(newRowData);
     };
 
     const studentColumn = {

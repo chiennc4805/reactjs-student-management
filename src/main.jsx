@@ -5,9 +5,10 @@ import {
 	RouterProvider,
 } from "react-router-dom";
 import App from './App.jsx';
+import CheckInStudentAttendancePage from './components/attendance/checkin.attendance.page.jsx';
 import ClassDetailPage from './components/class/view.class.page.jsx';
 import { AuthWrapper } from './components/context/auth.context.jsx';
-import CheckInStudentAttendancePage from './components/studentAttendance/checkin.student.attendance.page.jsx';
+import AttendancePage from './pages/attendance.jsx';
 import CampusPage from './pages/campus.jsx';
 import ClassPage from './pages/class.jsx';
 import FacilityPage from './pages/facility.jsx';
@@ -15,10 +16,8 @@ import LoginPage from './pages/login.jsx';
 import ParentPage from './pages/parent.jsx';
 import RolePage from './pages/role.jsx';
 import SchedulePage from './pages/schedule.jsx';
-import StudentAttendancePage from './pages/student.attendance.jsx';
 import StudentPage from './pages/student.jsx';
 import SubjectPage from './pages/subject.jsx';
-import TeacherAttendancePage from './pages/teacher.attendance.jsx';
 import TeacherPage from './pages/teacher.jsx';
 import UserPage from './pages/user.jsx';
 import Welcome from './pages/welcome.jsx';
@@ -79,15 +78,11 @@ const router = createBrowserRouter([
 				element: <UserPage />
 			},
 			{
-				path: "teacher-attendance",
-				element: <TeacherAttendancePage />
+				path: "attendance",
+				element: <AttendancePage />
 			},
 			{
-				path: "student-attendance",
-				element: <StudentAttendancePage />
-			},
-			{
-				path: "student-attendance/:className",
+				path: "attendance/:className",
 				element: <CheckInStudentAttendancePage />
 			},
 		]
