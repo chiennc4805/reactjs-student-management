@@ -3,7 +3,6 @@ import { Col, notification, Popconfirm, Row, Table } from 'antd';
 import { useState } from 'react';
 import { deleteCampusAPI } from '../../services/api.service';
 import UpdateCampusModal from './update.campus.modal';
-import ViewCampusDetail from './view.campus.drawer';
 
 
 const CampusTable = (props) => {
@@ -45,31 +44,18 @@ const CampusTable = (props) => {
                         {(index + 1) + (current - 1) * 10}
                     </span>
                 )
-            }
-        },
-        {
-            title: 'ID',
-            dataIndex: 'id',
-            render: (_, record) => {
-                return (
-                    <a href='#'
-                        onClick={() => {
-                            setCampusDetail(record)
-                            setIsDetailOpen(true);
-                        }}
-                    >
-                        {record.id}
-                    </a>
-                )
-            }
+            },
+            width: "14%"
         },
         {
             title: 'Cơ sở',
             dataIndex: 'name',
+            width: "25%"
         },
         {
             title: 'Địa chỉ',
             dataIndex: 'address',
+            width: "45%"
         },
         {
             title: 'Action',
@@ -140,11 +126,6 @@ const CampusTable = (props) => {
                 </Col>
             </Row>
 
-            <ViewCampusDetail
-                isDetailOpen={isDetailOpen}
-                setIsDetailOpen={setIsDetailOpen}
-                campusDetail={campusDetail}
-            />
             <UpdateCampusModal
                 loadCampus={loadCampus}
                 isUpdateFormOpen={isUpdateFormOpen}

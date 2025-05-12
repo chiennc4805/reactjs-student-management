@@ -1,5 +1,6 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Col, notification, Popconfirm, Row, Table } from 'antd';
+import dayjs from "dayjs";
 import { useState } from 'react';
 import { deleteParentAPI } from '../../services/api.service';
 import UpdateParentModal from './update.parent.modal';
@@ -41,27 +42,17 @@ const ParentTable = (props) => {
             dataIndex: 'stt',
             render: (_, record, index) => {
                 return (
-                    <span>
-                        {(index + 1) + (current - 1) * 10}
-                    </span>
-                )
-            }
-        },
-        {
-            title: 'ID',
-            dataIndex: 'id',
-            render: (_, record) => {
-                return (
                     <a href='#'
                         onClick={() => {
                             setParentDetail(record)
                             setIsDetailOpen(true);
                         }}
                     >
-                        {record.id}
+                        {(index + 1) + (current - 1) * 10}
                     </a>
                 )
-            }
+            },
+            width: "10%"
         },
         {
             title: 'Họ và tên',
@@ -76,11 +67,23 @@ const ParentTable = (props) => {
                         {record.gender ? "Nam" : "Nữ"}
                     </span>
                 )
-            }
+            },
+            width: "13%"
+        },
+        {
+            title: 'Ngày sinh',
+            dataIndex: 'birthDate',
+            render: (birthDate) => (
+                <span>
+                    {dayjs(birthDate).format("DD-MM-YYYY")}
+                </span>
+            ),
+            width: "17%"
         },
         {
             title: 'Số điện thoại',
             dataIndex: 'telephone',
+            width: "23%"
         },
         {
             title: 'Action',
@@ -105,22 +108,19 @@ const ParentTable = (props) => {
                     </Popconfirm>
                 </div>
             ),
+            width: "10%"
         },
     ];
 
-    const onChange = (pagination, filters, sorter, extra) => { //các tham số trên antd cung cấp sẵn
-        //setCurrent, setPageSize
-        //nếu thay đổi trang: current
+    const onChange = (pagination, filters, sorter, extra) => {
         if (pagination && pagination.current) {
             if (+pagination.current !== +current) {
-                setCurrent(+pagination.current) //convert về number
+                setCurrent(+pagination.current)
             }
         }
-
-        //nếu thay đổi tổng số phần tử: pageSize
         if (pagination && pagination.pageSize) {
             if (+pagination.pageSize !== +pageSize) {
-                setPageSize(+pagination.pageSize) //convert về number
+                setPageSize(+pagination.pageSize)
             }
         }
     };

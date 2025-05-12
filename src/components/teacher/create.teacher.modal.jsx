@@ -182,7 +182,7 @@ const TeacherForm = (props) => {
                         {/* row 4 */}
                         <Col xs={24} >
                             <Form.Item
-                                label="Kĩ năng"
+                                label="Chuyên môn"
                                 name="subjects"
                                 rules={[{ required: true, message: 'Vui lòng chọn kĩ năng!' }]}
                             >

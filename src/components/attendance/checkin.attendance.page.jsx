@@ -63,20 +63,50 @@ const CheckInStudentAttendancePage = () => {
         }
     };
 
-    const columnsTable = [
+    const columnsTableStudent = [
         {
             title: 'STT',
             render: (_, record, index) => <span>{index + 1}</span>,
+            width: "30%"
+
         },
         {
             title: "Tên học sinh",
             render: (_, record) => <span>{record.student.name}</span>,
+            width: "40%"
         },
         {
             title: "Trạng thái",
             render: (_, record) => (
                 <Form.Item
                     name={['studentAttendances', record.key, 'status']}
+                >
+                    <Radio.Group>
+                        <Radio value={true}>Có mặt</Radio>
+                        <Radio value={false}>Vắng mặt</Radio>
+                    </Radio.Group>
+                </Form.Item>
+            ),
+        },
+    ];
+
+    const columnsTableTeacher = [
+        {
+            title: 'STT',
+            render: (_, record, index) => <span>{index + 1}</span>,
+            width: "30%"
+
+        },
+        {
+            title: "Tên giáo viên",
+            dataIndex: "name",
+            width: "40%"
+        },
+        {
+            title: "Trạng thái",
+            render: (_, record) => (
+                <Form.Item
+                    name={['teacherAttendances', record.key, 'status']}
                 >
                     <Radio.Group>
                         <Radio value={true}>Có mặt</Radio>
@@ -103,7 +133,9 @@ const CheckInStudentAttendancePage = () => {
         try {
             const res = await fetchAllStudentAttendance(`date~'${dayjs().format('YYYY-MM-DD')}' and classInfo.name~'${className}'`);
             if (res.data && res.data.result.length) {
+                console.log("res data result: ", res.data.result)
                 const groupSlot = groupBySlot(res.data.result);
+                console.log("group slot: ", groupSlot)
                 setStudentData(groupSlot);
 
                 const initialValues = {
@@ -128,15 +160,27 @@ const CheckInStudentAttendancePage = () => {
             key: slotGroup.slot.toString(),
             closable: slotGroup.slot !== 1,
             children: (
-                <Table
-                    columns={columnsTable}
-                    dataSource={slotGroup.studentAttendances.map((studentAttendance) => ({
-                        ...studentAttendance,
-                        key: `${studentAttendance.id}`, // Tạo key duy nhất cho từng hàng
-                    }))}
-                    pagination={false}
-                    rowKey="key"
-                />
+                <>
+                    <h3 style={{ display: "flex", justifyContent: "start", marginBottom: "10px" }}>Điểm danh giáo viên</h3>
+                    <Table
+                        columns={columnsTableTeacher}
+                        dataSource={[slotGroup.studentAttendances[0].classInfo.teacher]}
+                        pagination={false}
+                        rowKey="key"
+                    />
+
+                    <h3 style={{ display: "flex", justifyContent: "start", margin: "30px 0px 10px 0px" }}>Điểm danh học sinh</h3>
+                    <Table
+                        columns={columnsTableStudent}
+                        dataSource={slotGroup.studentAttendances.map((studentAttendance) => ({
+                            ...studentAttendance,
+                            key: `${studentAttendance.id}`, // Tạo key duy nhất cho từng hàng
+                        }))}
+                        pagination={false}
+                        rowKey="key"
+                        showHeader={false}
+                    />
+                </>
             ),
         }));
     };
@@ -146,7 +190,6 @@ const CheckInStudentAttendancePage = () => {
             studentAttendanceId: sID,
             status: values.studentAttendances[sID].status
         }))
-        console.log("values: ", values)
         const res = await updateStudentAttendance(reqData)
         if (res.data) {
             openNotificationWithIcon('success', 'Thành công', 'Điểm danh thành công')

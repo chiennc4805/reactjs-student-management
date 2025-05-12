@@ -1,4 +1,4 @@
-import { Badge, Descriptions, Drawer, Tag } from 'antd';
+import { Descriptions, Drawer, Tag } from 'antd';
 
 
 const ViewTeacherDetail = (props) => {
@@ -44,7 +44,7 @@ const ViewTeacherDetail = (props) => {
         },
         {
             key: '8',
-            label: 'Lớp học',
+            label: 'Chuyên môn',
             span: 2,
             children:
                 <>
@@ -56,11 +56,6 @@ const ViewTeacherDetail = (props) => {
                         );
                     })}
                 </>
-        },
-        {
-            key: '9',
-            label: "Trạng thái",
-            children: <Badge status="success" text={teacherDetail?.status} />,
         },
     ]
 
@@ -75,7 +70,6 @@ const ViewTeacherDetail = (props) => {
                 {teacherDetail ?
                     <>
                         <Descriptions
-                            title="User Info"
                             layout="vertical"
                             bordered
                             items={items}

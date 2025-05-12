@@ -3,18 +3,18 @@ import { Button, Col, ConfigProvider, DatePicker, Divider, Result, Row, Table } 
 import viVN from 'antd/es/locale/vi_VN';
 import dayjs from "dayjs";
 import 'dayjs/locale/vi';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { useEffect, useState } from 'react';
 import { fetchAllStudentAttendance } from '../../services/api.service';
 
 const ScheduleTable = (props) => {
 
+    dayjs.extend(isSameOrAfter);
     const { weekdayList, rowData, setIsFormOpen, classData, setRowData } = props
-
     const [columns, setColumns] = useState([])
 
     useEffect(() => {
         if (weekdayList) {
-            console.log("rowData first time: ", rowData)
             onChangeMonth()
         }
     }, [weekdayList]);
@@ -47,8 +47,12 @@ const ScheduleTable = (props) => {
             firstDayInMonth = date.startOf("month")
         }
 
+        const daysToFetch = [];
         for (let i = firstDayInMonth; i.month() === chosenMonth; i = i.add(1, 'day')) {
             if (weekdayList?.includes(i.day())) {
+                if (dayjs().isSameOrAfter(i, 'day')) {
+                    daysToFetch.push(i.clone());
+                }
                 newColumns.push({
                     title: (
                         <>
@@ -73,15 +77,7 @@ const ScheduleTable = (props) => {
         }
         setColumns([studentColumn, ...newColumns]);
 
-        const daysToFetch = [];
-        for (let i = firstDayInMonth; i.month() === chosenMonth; i = i.add(1, 'day')) {
-            if (weekdayList?.includes(i.day()) && dayjs().isSameOrAfter(i, 'day')) {
-                daysToFetch.push(i.clone());
-            }
-        }
-
         let newRowData = [...rowData];
-
         for (const day of daysToFetch) {
             const dateString = day.format('YYYY-MM-DD');
 

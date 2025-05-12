@@ -2,6 +2,7 @@ import {
 	BankOutlined,
 	BugOutlined,
 	ClockCircleOutlined,
+	DollarOutlined,
 	EnvironmentOutlined,
 	ExceptionOutlined,
 	MenuFoldOutlined,
@@ -172,6 +173,11 @@ function App() {
 								key: "attendance",
 								label: <Link to="/attendance">Điểm danh</Link>,
 								icon: <ClockCircleOutlined />,
+							},
+							{
+								key: "fee",
+								label: <Link to="/fee">Học phí</Link>,
+								icon: <DollarOutlined />
 							},
 							{
 								key: "user",

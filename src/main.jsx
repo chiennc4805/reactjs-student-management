@@ -16,6 +16,7 @@ import LoginPage from './pages/login.jsx';
 import ParentPage from './pages/parent.jsx';
 import RolePage from './pages/role.jsx';
 import SchedulePage from './pages/schedule.jsx';
+import StudentFeePage from './pages/student.fee.jsx';
 import StudentPage from './pages/student.jsx';
 import SubjectPage from './pages/subject.jsx';
 import TeacherPage from './pages/teacher.jsx';
@@ -84,6 +85,10 @@ const router = createBrowserRouter([
 			{
 				path: "attendance/:className",
 				element: <CheckInStudentAttendancePage />
+			},
+			{
+				path: "fee",
+				element: <StudentFeePage />
 			},
 		]
 	},

@@ -1,32 +1,65 @@
-import { Button, Drawer } from 'antd';
+import { Descriptions, Drawer } from 'antd';
 
 
 const ViewParentDetail = (props) => {
 
     const { isDetailOpen, setIsDetailOpen, parentDetail } = props
 
+    const items = [
+        {
+            key: '1',
+            label: 'Họ và tên',
+            children: <span>{parentDetail?.name}</span>,
+        },
+        {
+            key: '2',
+            label: 'Số điện thoại',
+            children: <span>{parentDetail?.telephone}</span>,
+        },
+        {
+            key: '3',
+            label: 'Giới tính',
+            children: <span>{parentDetail?.gender ? "Nam" : "Nữ"}</span>,
+        },
+        {
+            key: '4',
+            label: 'Ngày sinh',
+            children: <span>{parentDetail?.birthDate}</span>,
+        },
+        {
+            key: '5',
+            label: 'Địa chỉ',
+            span: 2,
+            children: <span>{parentDetail?.address}</span>,
+        },
+        {
+            key: '6',
+            label: 'Tên Zalo',
+            children: <span>{parentDetail?.zaloName}</span>,
+        },
+        {
+            key: '7',
+            label: 'Tên Facebook',
+            children: <span>{parentDetail?.facebookName}</span>,
+        },
+    ]
+
     return (
         <>
             <Drawer
-                width={"30vw"}
+                width={"40vw"}
                 title="Thông tin chi tiết"
                 onClose={() => { setIsDetailOpen(false) }}
                 open={isDetailOpen}
             >
                 {parentDetail ?
                     <>
-                        <div style={{ gap: "10px" }}>
-                            <h4>ID </h4> {parentDetail.id}
-                        </div>
-                        <br />
-                        <div style={{ gap: "10px" }}>
-                            <h4>Cơ sở </h4> {parentDetail.name}
-                        </div>
-                        <br />
-                        <div style={{ gap: "10px" }}>
-                            <h4 style={{ width: "50px" }}>Địa chỉ </h4> {parentDetail.address}
-                        </div>
-                        <br />
+                        <Descriptions
+                            layout="vertical"
+                            bordered
+                            items={items}
+                            column={2}
+                        />
                     </>
                     :
                     <>

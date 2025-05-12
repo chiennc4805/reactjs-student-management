@@ -1,17 +1,18 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Col, notification, Popconfirm, Row, Table } from 'antd';
 import { useState } from 'react';
-import { deleteSubjectAPI } from '../../services/api.service';
-import UpdateSubjectModal from './update.subject.modal';
 
 
-const SubjectTable = (props) => {
+
+const StudentFeeTable = (props) => {
 
     const [api, contextHolder] = notification.useNotification();
 
-    const { dataSubjects, loadSubject, pageSize, setPageSize,
+    const { dataStudentFee, loadStudentFee, pageSize, setPageSize,
         current, setCurrent, total } = props
 
+    const [campusDetail, setCampusDetail] = useState(null)
+    const [isDetailOpen, setIsDetailOpen] = useState(false)
     const [dataUpdate, setDataUpdate] = useState(null)
     const [isUpdateFormOpen, setIsUpdateFormOpen] = useState(false)
 
@@ -22,11 +23,11 @@ const SubjectTable = (props) => {
         });
     };
 
-    const handleDeleteSubject = async (id) => {
-        const res = await deleteSubjectAPI(id)
+    const handleDeleteStudent = async (id) => {
+        const res = await deleteCampusAPI(id)
         if (res.data) {
-            openNotificationWithIcon('success', 'Thành công', 'Xoá môn học thành công')
-            await loadSubject()
+            openNotificationWithIcon('success', 'Thành công', 'Xoá cơ sở thành công')
+            await loadStudentFee()
         } else {
             openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
         }
@@ -42,33 +43,16 @@ const SubjectTable = (props) => {
                         {(index + 1) + (current - 1) * 10}
                     </span>
                 )
-            },
-            width: "14%"
+            }
         },
         {
-            title: 'Tên môn học',
+            title: 'Cơ sở',
             dataIndex: 'name',
-            width: "27%"
         },
         {
-            title: 'Giá tiền',
-            dataIndex: 'pricePerDay',
-            width: "21%"
+            title: 'Địa chỉ',
+            dataIndex: 'address',
         },
-        {
-            title: 'Tiền lương',
-            dataIndex: 'salaryPerDay',
-            width: "21%"
-        },
-        // {
-        //     title: 'Trạng thái',
-        //     //dataIndex: 'birthDate',
-        //     render: (_, record) => {
-        //         return (
-        //             <Tag color="success">ACTIVE</Tag>
-        //         )
-        //     }
-        // },
         {
             title: 'Action',
             key: 'action',
@@ -81,11 +65,11 @@ const SubjectTable = (props) => {
                         }} />
 
                     <Popconfirm
-                        title="Xoá môn học"
-                        description="Bạn chắc chắn xoá môn học này?"
-                        onConfirm={() => handleDeleteSubject(record.id)}
-                        okText="Có"
-                        cancelText="Không"
+                        title="Xoá cơ sở"
+                        description="Bạn chắc chắn xoá cơ sở này?"
+                        onConfirm={() => handleDeleteStudent(record.id)}
+                        okText="Yes"
+                        cancelText="No"
                         placement='left'
                     >
                         <DeleteOutlined style={{ cursor: "pointer", color: "red" }} />
@@ -122,7 +106,7 @@ const SubjectTable = (props) => {
                     <Table
                         rowKey={"id"}
                         columns={columns}
-                        dataSource={dataSubjects}
+                        dataSource={dataStudentFee}
                         bordered={true}
                         size='large'
                         pagination={
@@ -137,18 +121,10 @@ const SubjectTable = (props) => {
                     />
                 </Col>
             </Row>
-
-            <UpdateSubjectModal
-                loadSubject={loadSubject}
-                isUpdateFormOpen={isUpdateFormOpen}
-                setIsUpdateFormOpen={setIsUpdateFormOpen}
-                dataUpdate={dataUpdate}
-                setDataUpdate={setDataUpdate}
-            />
         </>
 
     )
 
 }
 
-export default SubjectTable;
+export default StudentFeeTable;

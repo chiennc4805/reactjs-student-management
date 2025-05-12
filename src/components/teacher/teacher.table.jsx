@@ -8,9 +8,6 @@ import ViewTeacherDetail from './view.teacher.drawer';
 
 const TeacherTable = (props) => {
 
-    const colors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'lime', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
-
-
     const [api, contextHolder] = notification.useNotification();
 
     const { dataTeachers, loadTeacher, pageSize, setPageSize,
@@ -39,23 +36,10 @@ const TeacherTable = (props) => {
     }
 
     const columns = [
-        //STT
         {
             title: 'STT',
             dataIndex: 'stt',
             render: (_, record, index) => {
-                return (
-                    <span>
-                        {(index + 1) + (current - 1) * 10}
-                    </span>
-                )
-            }
-        },
-        //ID
-        {
-            title: 'ID',
-            dataIndex: 'id',
-            render: (_, record) => {
                 return (
                     <a href='#'
                         onClick={() => {
@@ -63,12 +47,11 @@ const TeacherTable = (props) => {
                             setIsDetailOpen(true);
                         }}
                     >
-                        {record.id}
+                        {(index + 1) + (current - 1) * 10}
                     </a>
                 )
             }
         },
-        //Họ và tên
         {
             title: 'Họ và tên',
             dataIndex: 'name',
@@ -100,9 +83,8 @@ const TeacherTable = (props) => {
             render: (subjects) => (
                 <>
                     {subjects.map(subject => {
-                        const color = colors[Math.floor(Math.random() * colors.length)];
                         return (
-                            <Tag color={color} key={subject.id}>
+                            <Tag key={subject.id}>
                                 {subject.name}
                             </Tag>
                         );
@@ -110,15 +92,6 @@ const TeacherTable = (props) => {
                 </>
             ),
             width: "25%"
-        },
-        {
-            title: 'Trạng thái',
-            //dataIndex: 'birthDate',
-            render: (_, record) => {
-                return (
-                    <Tag color="success">ACTIVE</Tag>
-                )
-            }
         },
         {
             title: 'Action',

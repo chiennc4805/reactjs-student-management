@@ -1,9 +1,9 @@
-import { Col, DatePicker, Form, Input, InputNumber, Modal, notification, Row, Select } from "antd";
-import locale from 'antd/es/date-picker/locale/vi_VN'
-import { useEffect, useState } from "react";
-import { updateStudentAPI, updateSubjectAPI, updateTeacherAPI } from "../../services/api.service";
+import { Col, DatePicker, Form, Input, Modal, notification, Row, Select } from "antd";
+import locale from 'antd/es/date-picker/locale/vi_VN';
 import dayjs from "dayjs";
-import customParseFormat from 'dayjs/plugin/customParseFormat'
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { useEffect } from "react";
+import { updateTeacherAPI } from "../../services/api.service";
 
 
 const UpdateTeacherModal = (props) => {
@@ -189,7 +189,7 @@ const UpdateTeacherModal = (props) => {
                         {/* row 4 */}
                         <Col xs={24} >
                             <Form.Item
-                                label="Kĩ năng"
+                                label="Chuyên môn"
                                 name="subjects"
                                 rules={[{ required: true, message: 'Vui lòng chọn kĩ năng!' }]}
                             >

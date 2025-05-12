@@ -14,8 +14,6 @@ const StudentPage = () => {
 
     const filter = useSelector((state) => state.search.student)
 
-    console.log("filter: ", filter)
-
     useEffect(() => {
         loadStudent()
     }, [current, pageSize, filter])

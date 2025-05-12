@@ -51,11 +51,13 @@ const StudentTable = (props) => {
                         {(index + 1) + (current - 1) * 10}
                     </a>
                 )
-            }
+            },
+            width: "8%"
         },
         {
             title: 'Họ và tên',
             dataIndex: 'name',
+            width: "20%"
         },
         {
             title: 'Giới tính',
@@ -66,7 +68,9 @@ const StudentTable = (props) => {
                         {record.gender ? "Nam" : "Nữ"}
                     </span>
                 )
-            }
+            },
+            width: "10%"
+
         },
         {
             title: 'Ngày sinh',
@@ -75,15 +79,8 @@ const StudentTable = (props) => {
                 <span>
                     {dayjs(birthDate).format("DD-MM-YYYY")}
                 </span>
-            )
-        },
-        {
-            title: 'Chiều cao (cm)',
-            dataIndex: 'height',
-        },
-        {
-            title: 'Cân nặng (kg)',
-            dataIndex: 'weight',
+            ),
+            width: "12%"
         },
         {
             title: 'Lớp học',
@@ -98,9 +95,18 @@ const StudentTable = (props) => {
             )
         },
         {
+            title: 'Số điện thoại PH',
+            render: (_, record) => (
+                <span>
+                    {record.parent?.telephone}
+                </span>
+            ),
+            width: "18%",
+        },
+        {
             title: 'Action',
             key: 'action',
-            render: (_, record) => ( //record là bản ghi (record tương ứng với dòng dữ liệu)
+            render: (_, record) => (
                 <div style={{ display: "flex", gap: "20px" }}>
                     <EditOutlined style={{ cursor: "pointer", color: "orange" }}
                         onClick={() => {
@@ -120,6 +126,7 @@ const StudentTable = (props) => {
                     </Popconfirm>
                 </div>
             ),
+            width: "10%"
         },
     ];
 
@@ -166,11 +173,6 @@ const StudentTable = (props) => {
                 </Col>
             </Row>
 
-            <ViewStudentDetail
-                isDetailOpen={isDetailOpen}
-                setIsDetailOpen={setIsDetailOpen}
-                studentDetail={studentDetail}
-            />
             <UpdateStudentModal
                 loadStudent={loadStudent}
                 isUpdateFormOpen={isUpdateFormOpen}
@@ -178,6 +180,11 @@ const StudentTable = (props) => {
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
                 classOptions={classOptions}
+            />
+            <ViewStudentDetail
+                studentDetail={studentDetail}
+                isDetailOpen={isDetailOpen}
+                setIsDetailOpen={setIsDetailOpen}
             />
         </>
 
