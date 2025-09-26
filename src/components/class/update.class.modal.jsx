@@ -38,7 +38,7 @@ const UpdateClassModal = (props) => {
             await loadClass()
             reloadAndCloseModal()
         } else {
-            openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
+            openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message).includes("điện thoại") ? "Số điện thoại giáo viên không tồn tại, vui lòng vào mục giáo viên để kiểm tra!" : JSON.stringify(res.message))
         }
     };
 

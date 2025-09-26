@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import 'dayjs/locale/vi';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import { useEffect, useState } from 'react';
-import { fetchAllStudentAttendance } from '../../services/api.service';
+import { fetchAllStudentAttendance, fetchAllTeacherAttendance } from '../../services/api.service';
 
 const ScheduleTable = (props) => {
 
@@ -81,17 +81,27 @@ const ScheduleTable = (props) => {
         for (const day of daysToFetch) {
             const dateString = day.format('YYYY-MM-DD');
 
-            const res = await fetchAllStudentAttendance(`date='${dateString}' and classInfo.name='${classData?.name}'`);
+            const resStudent = await fetchAllStudentAttendance(`date='${dateString}' and classInfo.name='${classData?.name}'`);
+            const resTeacher = await fetchAllTeacherAttendance(`date='${dateString}' and classInfo.name='${classData?.name}'`)
 
-            if (res.data && res.data.result.length) {
-                const data = res.data.result.filter(item => item.statusOfClass === true);
-                if (data.length === 0) {
+            if (resStudent.data && resStudent.data.result.length && resTeacher.data && resTeacher.data.result.length) {
+                const studentData = resStudent.data.result
+                const teacherData = resTeacher.data.result
+                const dataFiltered = [...studentData, ...teacherData].filter(item => item.statusOfClass === true);
+                console.log("data filter: ", dataFiltered)
+                if (dataFiltered.length === 0) {
                     continue;
                 }
 
                 newRowData = newRowData.map(row => {
-                    const statusOfSlot = data
-                        .filter(x => x.student.id === row.sId)
+                    const statusOfSlot = dataFiltered
+                        .filter(x => {
+                            if (x.student) {
+                                return x.student.id === row.sId
+                            } else if (x.teacher) {
+                                return x.teacher.id === row.tId
+                            }
+                        })
                         .sort((a, b) => a.slot - b.slot)
                         .map(x => x.status);
 
@@ -116,13 +126,19 @@ const ScheduleTable = (props) => {
                     onChange={onChangeMonth}
                     picker="month"
                     format={"MM/YYYY"}
+                    minDate={dayjs().subtract(2, "year")}
+                    maxDate={dayjs().endOf("month")}
                 />
             </div>
         ),
-        dataIndex: 'studentName',
         key: 'studentName',
         width: 150,
         fixed: 'left',
+        render: (_, record) => (
+            <span>
+                {record.studentName || record.teacherName}
+            </span>
+        )
     };
 
     // Thiết lập locale tiếng Việt cho dayjs

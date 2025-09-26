@@ -59,18 +59,6 @@ const ParentTable = (props) => {
             dataIndex: 'name',
         },
         {
-            title: 'Giới tính',
-            dataIndex: 'gender',
-            render: (_, record) => {
-                return (
-                    <span>
-                        {record.gender ? "Nam" : "Nữ"}
-                    </span>
-                )
-            },
-            width: "13%"
-        },
-        {
             title: 'Ngày sinh',
             dataIndex: 'birthDate',
             render: (birthDate) => (
@@ -78,12 +66,22 @@ const ParentTable = (props) => {
                     {dayjs(birthDate).format("DD-MM-YYYY")}
                 </span>
             ),
-            width: "17%"
+            width: "13%"
         },
         {
             title: 'Số điện thoại',
             dataIndex: 'telephone',
-            width: "23%"
+            width: "15%"
+        },
+        {
+            title: 'Tên Zalo',
+            dataIndex: 'zaloName',
+            width: "15%"
+        },
+        {
+            title: 'Tên Facebook',
+            dataIndex: 'facebookName',
+            width: "15%"
         },
         {
             title: 'Action',

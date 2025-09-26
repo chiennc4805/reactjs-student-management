@@ -56,23 +56,6 @@ const TeacherTable = (props) => {
             title: 'Họ và tên',
             dataIndex: 'name',
         },
-        // {
-        //     title: 'Giới tính',
-        //     dataIndex: 'gender',
-        //     render: (_, record) => {
-        //         return (
-        //             <span>
-        //                 {record.gender ? "Nam" : "Nữ"}
-        //             </span>
-        //         )
-        //     }
-        // },
-        // {
-        //     title: 'Ngày sinh',
-        //     dataIndex: 'birthDate',
-        // },
-
-        //Số điện thoại
         {
             title: 'Số điện thoại',
             dataIndex: 'telephone',
@@ -92,6 +75,10 @@ const TeacherTable = (props) => {
                 </>
             ),
             width: "25%"
+        },
+        {
+            title: 'Tên Zalo',
+            dataIndex: 'zaloName',
         },
         {
             title: 'Action',

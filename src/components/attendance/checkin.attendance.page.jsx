@@ -1,8 +1,8 @@
 import { Breadcrumb, Button, Form, notification, Radio, Table, Tabs } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { fetchAllStudentAttendance, updateStudentAttendance } from "../../services/api.service";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { fetchAllStudentAttendance, fetchAllTeacherAttendance, updateStudentAttendance, updateTeacherAttendance } from "../../services/api.service";
 
 const CheckInStudentAttendancePage = () => {
     const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
@@ -12,6 +12,7 @@ const CheckInStudentAttendancePage = () => {
     const [form] = Form.useForm();
     const newTabIndex = useRef(1);
     const [items, setItems] = useState([])
+    const navigate = useNavigate()
 
     useEffect(() => {
         fetchStudentAttendanceInClass();
@@ -99,7 +100,7 @@ const CheckInStudentAttendancePage = () => {
         },
         {
             title: "Tên giáo viên",
-            dataIndex: "name",
+            render: (_, record) => <span>{record.teacher.name}</span>,
             width: "40%"
         },
         {
@@ -117,26 +118,31 @@ const CheckInStudentAttendancePage = () => {
         },
     ];
 
-    const groupBySlot = (data) => {
-        const groupedData = data.reduce((acc, item) => {
-            acc[item.slot] = acc[item.slot] || [];
-            acc[item.slot].push(item);
-            return acc;
-        }, {});
-        return Object.keys(groupedData).map((key) => ({
-            slot: key,
-            studentAttendances: groupedData[key],
-        }));
+    const groupStudentAndTeacherBySlot = (studentData, teacherData) => {
+        const groupedData = {};
+        studentData.forEach(item => {
+            if (!groupedData[item.slot]) {
+                groupedData[item.slot] = { slot: item.slot, studentAttendances: [], teacherAttendances: [] };
+            }
+            groupedData[item.slot].studentAttendances.push(item);
+        });
+        teacherData.forEach(item => {
+            if (!groupedData[item.slot]) {
+                groupedData[item.slot] = { slot: item.slot, studentAttendances: [], teacherAttendances: [] };
+            }
+            groupedData[item.slot].teacherAttendances.push(item);
+        });
+
+        return Object.values(groupedData);
     };
 
     const fetchStudentAttendanceInClass = async () => {
         try {
-            const res = await fetchAllStudentAttendance(`date~'${dayjs().format('YYYY-MM-DD')}' and classInfo.name~'${className}'`);
-            if (res.data && res.data.result.length) {
-                console.log("res data result: ", res.data.result)
-                const groupSlot = groupBySlot(res.data.result);
-                console.log("group slot: ", groupSlot)
-                setStudentData(groupSlot);
+            let groupSlot;
+            const resStudent = await fetchAllStudentAttendance(`date~'${dayjs().format('YYYY-MM-DD')}' and classInfo.name~'${className}'`);
+            const resTeacher = await fetchAllTeacherAttendance(`date~'${dayjs().format('YYYY-MM-DD')}' and classInfo.name~'${className}'`);
+            if (resStudent.data && resStudent.data.result.length && resTeacher.data && resTeacher.data.result.length) {
+                groupSlot = groupStudentAndTeacherBySlot(resStudent.data.result, resTeacher.data.result)
 
                 const initialValues = {
                     studentAttendances: groupSlot.reduce((acc, slotGroup) => {
@@ -145,8 +151,15 @@ const CheckInStudentAttendancePage = () => {
                         });
                         return acc;
                     }, {}),
+                    teacherAttendances: groupSlot.reduce((acc, slotGroup) => {
+                        slotGroup.teacherAttendances.forEach(teacherAttendance => {
+                            acc[teacherAttendance.id] = { status: teacherAttendance.status };
+                        });
+                        return acc;
+                    }, {}),
                 };
                 form.setFieldsValue(initialValues);
+                setStudentData(groupSlot);
             }
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu điểm danh:", error);
@@ -164,9 +177,13 @@ const CheckInStudentAttendancePage = () => {
                     <h3 style={{ display: "flex", justifyContent: "start", marginBottom: "10px" }}>Điểm danh giáo viên</h3>
                     <Table
                         columns={columnsTableTeacher}
-                        dataSource={[slotGroup.studentAttendances[0].classInfo.teacher]}
+                        dataSource={slotGroup.teacherAttendances.map((teacherAttendance) => ({
+                            ...teacherAttendance,
+                            key: `${teacherAttendance.id}`,
+                        }))}
                         pagination={false}
                         rowKey="key"
+                        showHeader={false}
                     />
 
                     <h3 style={{ display: "flex", justifyContent: "start", margin: "30px 0px 10px 0px" }}>Điểm danh học sinh</h3>
@@ -174,7 +191,7 @@ const CheckInStudentAttendancePage = () => {
                         columns={columnsTableStudent}
                         dataSource={slotGroup.studentAttendances.map((studentAttendance) => ({
                             ...studentAttendance,
-                            key: `${studentAttendance.id}`, // Tạo key duy nhất cho từng hàng
+                            key: `${studentAttendance.id}`,
                         }))}
                         pagination={false}
                         rowKey="key"
@@ -186,16 +203,25 @@ const CheckInStudentAttendancePage = () => {
     };
 
     const onFinish = async (values) => {
-        const reqData = Object.keys(values.studentAttendances).map(sID => ({
-            studentAttendanceId: sID,
+        const reqStudentData = Object.keys(values.studentAttendances).map(sID => ({
+            attendanceId: sID,
             status: values.studentAttendances[sID].status
         }))
-        const res = await updateStudentAttendance(reqData)
-        if (res.data) {
+        const resStudent = await updateStudentAttendance(reqStudentData)
+
+        const reqTeacherData = Object.keys(values.teacherAttendances).map(tId => ({
+            attendanceId: tId,
+            status: values.teacherAttendances[tId].status
+        }))
+        const resTeacher = await updateTeacherAttendance(reqTeacherData[0])
+
+        if (resStudent.data && resTeacher.data) {
             openNotificationWithIcon('success', 'Thành công', 'Điểm danh thành công')
+            setTimeout(() => navigate("/attendance"), 1000)
         } else {
             openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
         }
+
     };
 
     const onChangeTab = (newActiveKey) => {

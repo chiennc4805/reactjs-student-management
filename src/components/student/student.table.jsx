@@ -52,12 +52,12 @@ const StudentTable = (props) => {
                     </a>
                 )
             },
-            width: "8%"
+            width: "9%"
         },
         {
             title: 'Họ và tên',
             dataIndex: 'name',
-            width: "20%"
+            width: "22%"
         },
         {
             title: 'Giới tính',
@@ -73,14 +73,13 @@ const StudentTable = (props) => {
 
         },
         {
-            title: 'Ngày sinh',
-            dataIndex: 'birthDate',
-            render: (birthDate) => (
+            title: 'Tuổi',
+            render: (_, record) => (
                 <span>
-                    {dayjs(birthDate).format("DD-MM-YYYY")}
+                    {dayjs().year() - dayjs(record.birthDate).year()}
                 </span>
             ),
-            width: "12%"
+            width: "10%"
         },
         {
             title: 'Lớp học',

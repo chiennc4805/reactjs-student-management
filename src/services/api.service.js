@@ -432,7 +432,63 @@ const updateStudentAttendance = (data) => {
     return axios.put(URL_BACKEND, data)
 }
 
+//module teacher attendance api
+const fetchAllTeacherAttendance = (filter = null) => {
+    let URL_BACKEND
+    if (filter) {
+        URL_BACKEND = `/teacher-attendance?filter=${filter}`
+    } else {
+        URL_BACKEND = `/teacher-attendance`
+    }
+    return axios.get(URL_BACKEND)
+}
+
+const updateTeacherAttendance = (data) => {
+    const URL_BACKEND = `/teacher-attendance`
+    return axios.put(URL_BACKEND, data)
+}
+
+//module student fee api
+const fetchAllStudentFee = (page, pageSize, filter = null) => {
+    let URL_BACKEND
+    if (filter) {
+        URL_BACKEND = `/student-fee?page=${page}&size=${pageSize}&filter=${filter}`
+    } else {
+        URL_BACKEND = `/student-fee?page=${page}&size=${pageSize}`
+    }
+    return axios.get(URL_BACKEND)
+}
+
+const exportStudentFeeToExcel = (month) => {
+    const URL_BACKEND = `/student-fee/export/excel?month=${month}`;
+
+    return axios.get(URL_BACKEND, {
+        responseType: 'blob', // Quan trọng: Xác định response type là blob
+    })
+        .then(response => {
+            let filename = `hoc_phi_thang_${month}.xlsx`;
+
+            // Tạo URL cho blob
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+
+            // Tạo thẻ <a> tạm thời để download
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+
+            // Click để download
+            link.click();
+
+            // Clean up
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            return true;
+        });
+}
+
 export {
-    createCampusAPI, createClassAPI, createParentAPI, createRoleAPI, createScheduleAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, createUserAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteRoleAPI, deleteScheduleAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, deleteUserAPI, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassEnrollmentAPIWithoutPagination, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllPermissionsAPI, fetchAllRolesAPI, fetchAllStudentAttendance, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI, fetchAllTeachersAPI, fetchAllUsersAPI, fetchClassByName, fetchScheduleInWeek, getAccountAPI, getRefreshToken, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateRoleAPI, updateScheduleAPI, updateStudentAPI, updateStudentAttendance, updateSubjectAPI, updateTeacherAPI, updateUserAPI
+    createCampusAPI, createClassAPI, createParentAPI, createRoleAPI, createScheduleAPI, createStudentAPI, createSubjectAPI, createTeacherAPI, createUserAPI, deleteCampusAPI, deleteClassAPI, deleteParentAPI, deleteRoleAPI, deleteScheduleAPI, deleteStudentAPI, deleteSubjectAPI, deleteTeacherAPI, deleteUserAPI, exportStudentFeeToExcel, fetchAllCampusAPI, fetchAllCampusWithoutPaginationAPI, fetchAllClassEnrollmentAPIWithoutPagination, fetchAllClassesAPI, fetchAllClassesWithoutPaginationAPI, fetchAllParentsAPI, fetchAllPermissionsAPI, fetchAllRolesAPI, fetchAllStudentAttendance, fetchAllStudentFee, fetchAllStudentsAPI, fetchAllSubjectsAPI, fetchAllSubjectsWithoutPaginationAPI, fetchAllTeacherAttendance, fetchAllTeachersAPI, fetchAllUsersAPI, fetchClassByName, fetchScheduleInWeek, getAccountAPI, getRefreshToken, loginAPI, logoutAPI, updateCampusAPI, updateClassAPI, updateParentAPI, updateRoleAPI, updateScheduleAPI, updateStudentAPI, updateStudentAttendance, updateSubjectAPI, updateTeacherAPI, updateTeacherAttendance, updateUserAPI
 };
 

@@ -49,7 +49,7 @@ const ClassTable = (props) => {
         {
             title: 'Tên lớp học',
             dataIndex: 'name',
-            width: "14%"
+            width: "20%"
         },
         {
             title: 'Dạy môn',
@@ -74,7 +74,7 @@ const ClassTable = (props) => {
             dataIndex: 'campus',
             render: (campus) => (
                 <Tag>
-                    {campus.name} - {campus.address}
+                    {campus.name}
                 </Tag>
             )
         },

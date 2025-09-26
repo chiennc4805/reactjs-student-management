@@ -3,84 +3,106 @@ import { useEffect } from "react";
 import { updateRoleAPI } from "../../services/api.service";
 import ModuleApi from "./list.module.api";
 
-
 const UpdateRoleModal = (props) => {
-
     const [api, contextHolder] = notification.useNotification({ maxCount: 1 });
-    const [form] = Form.useForm()
+    const [form] = Form.useForm();
 
-    const { isUpdateFormOpen, setIsUpdateFormOpen, loadRole, setDataUpdate, dataUpdate, listAllPermissions } = props
+    const { isUpdateFormOpen, setIsUpdateFormOpen, loadRole, setDataUpdate, dataUpdate, listAllPermissions } = props;
 
     useEffect(() => {
         if (dataUpdate) {
-            form.setFieldValue("id", dataUpdate.id)
-            form.setFieldValue("name", dataUpdate.name)
-            form.setFieldValue("description", dataUpdate.description)
-            form.setFieldValue("active", dataUpdate.active)
-        }
+            // Thiết lập form với giá trị ban đầu
+            const initialValues = {
+                id: dataUpdate.id,
+                name: dataUpdate.name,
+                description: dataUpdate.description,
+                active: dataUpdate.active !== undefined ? dataUpdate.active : false,
+                permissions: {}
+            };
 
-        if (dataUpdate && listAllPermissions) {
-            listAllPermissions.forEach((group) => {
-                group.permissions.forEach((permission) => {
-                    const isChecked = dataUpdate.permissions.some((p) => p.id === permission.id);
-                    form.setFieldValue(["permissions", permission.id], isChecked);
+            // Đặt giá trị cho tất cả permissions là false
+            if (listAllPermissions && listAllPermissions.length > 0) {
+                listAllPermissions.forEach((group) => {
+                    initialValues.permissions[group.module] = false;
+
+                    if (group.permissions && group.permissions.length > 0) {
+                        group.permissions.forEach((permission) => {
+                            initialValues.permissions[permission.id] = false;
+                        });
+                    }
                 });
-                const commonState = group.permissions.every(permission => form.getFieldValue(["permissions", permission.id]));
-                form.setFieldValue(["permissions", group.module], commonState && true);
-            });
-        } else if (listAllPermissions) {
-            listAllPermissions.forEach((group) => {
-                form.setFieldValue(["permissions", group.module], false);
-                group.permissions.forEach((permission) => {
-                    form.setFieldValue(["permissions", permission.id], false);
+            }
+
+            // Cập nhật giá trị của permissions từ dataUpdate
+            if (dataUpdate.permissions && dataUpdate.permissions.length > 0) {
+                dataUpdate.permissions.forEach((permission) => {
+                    initialValues.permissions[permission.id] = true;
                 });
-            });
+
+                // Cập nhật trạng thái module dựa trên permissions
+                listAllPermissions.forEach((group) => {
+                    if (group.permissions && group.permissions.length > 0) {
+                        const allPermissionsSelected = group.permissions.every(permission =>
+                            dataUpdate.permissions.some(p => p.id === permission.id)
+                        );
+                        initialValues.permissions[group.module] = allPermissionsSelected;
+                    }
+                });
+            }
+
+            form.setFieldsValue(initialValues);
         }
-
-    }, [dataUpdate])
-
-    const openNotificationWithIcon = (type, message, description) => {
-        api[type]({
-            message: message,
-            description: description
-        });
-    };
+    }, [dataUpdate]);
 
     const onFinish = async (values) => {
-        const permissions = Object.keys(values.permissions).filter(key => values.permissions[key] === true && key.length === 36).map(x => ({ id: x }))
+        console.log("form values:", values);
+
+        const permissions = [];
+        if (values.permissions) {
+            Object.keys(values.permissions).forEach(key => {
+                if (key.length === 36 && values.permissions[key] === true) {
+                    permissions.push({ id: key });
+                }
+            });
+        }
 
         const res = await updateRoleAPI(values.id, values.name, values.description, values.active, permissions)
         if (res.data) {
-            openNotificationWithIcon('success', 'Thành công', 'Cập nhật vai trò thành công')
-            await loadRole()
-            reloadAndCloseModal()
+            api.success({
+                message: 'Thành công',
+                description: 'Cập nhật vai trò thành công'
+            });
+            await loadRole();
+            reloadAndCloseModal();
         } else {
-            openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
+            api.error({
+                message: 'Thất bại',
+                description: JSON.stringify(res.message)
+            });
         }
-
-        console.log("values form: ", values)
     };
 
     const reloadAndCloseModal = () => {
-        setIsUpdateFormOpen(false)
-        setDataUpdate(null)
-    }
+        form.resetFields();
+        setIsUpdateFormOpen(false);
+        setDataUpdate(null);
+    };
 
     return (
         <>
             {contextHolder}
 
             <Modal
-                title="Cập nhật lớp học"
+                title="Cập nhật vai trò"
                 open={isUpdateFormOpen}
                 onOk={() => form.submit()}
-                onCancel={() => reloadAndCloseModal()}
+                onCancel={reloadAndCloseModal}
                 okText="Cập nhật"
                 cancelText="Huỷ"
                 footer={(_, { OkBtn, CancelBtn }) => (
                     <>
-                        <OkBtn />
                         <CancelBtn />
+                        <OkBtn />
                     </>
                 )}
                 width={{
@@ -92,13 +114,15 @@ const UpdateRoleModal = (props) => {
                     xxl: '40%',
                 }}
                 maskClosable={false}
+                destroyOnClose={true}
             >
                 <Form
                     form={form}
                     onFinish={onFinish}
                     layout="vertical"
+                    preserve={false}
                 >
-                    <Row justify={"center"} style={{ marginTop: "20px" }}>
+                    <Row justify="center" style={{ marginTop: "20px" }}>
                         <Col xs={24} style={{ display: "flex", justifyContent: "space-between" }}>
                             <Form.Item
                                 style={{ display: "none" }}
@@ -119,7 +143,6 @@ const UpdateRoleModal = (props) => {
                                 label="Trạng thái"
                                 name="active"
                                 valuePropName="checked"
-                                initialValue={dataUpdate?.active || true}
                             >
                                 <Switch checkedChildren="ACTIVE" unCheckedChildren="INACTIVE" />
                             </Form.Item>
@@ -149,7 +172,7 @@ const UpdateRoleModal = (props) => {
                 </Form>
             </Modal>
         </>
-    )
-}
+    );
+};
 
 export default UpdateRoleModal;

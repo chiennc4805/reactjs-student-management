@@ -10,7 +10,7 @@ const SchedulePage = () => {
 
     const [classData, setClassData] = useState(null)
     const [weekdayList, setWeekdayList] = useState(null)
-    const [rowData, setRowData] = useState(null)
+    const [rowData, setRowData] = useState([])
     const [isFormOpen, setIsFormOpen] = useState(false)
 
     useEffect(() => {
@@ -23,18 +23,19 @@ const SchedulePage = () => {
         setRowData(null);
 
         const res = await fetchClassByName(name)
-
         if (res.data) {
+            console.log("res data: ", res.data)
             if (res.data.schedule) {
                 const data = res.data.students.map(s => (
                     {
                         sId: s.id,
-                        studentName: s.name
+                        studentName: s.name,
                     }
                 ))
+                data.push({ tId: res.data.teacher.id, teacherName: `${res.data.teacher.name} (giáo viên)` })
+                console.log("row data: ", data)
                 setWeekdayList(res.data.schedule.weekdayList)
                 setRowData(data);
-                console.log("row data: ", data)
 
             }
             setClassData(res.data)

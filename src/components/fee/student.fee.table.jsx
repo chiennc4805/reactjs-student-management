@@ -1,37 +1,14 @@
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Col, notification, Popconfirm, Row, Table } from 'antd';
-import { useState } from 'react';
-
-
+import { Col, Row, Table, Tag } from 'antd';
 
 const StudentFeeTable = (props) => {
 
-    const [api, contextHolder] = notification.useNotification();
-
-    const { dataStudentFee, loadStudentFee, pageSize, setPageSize,
+    const { dataStudentFee, pageSize, setPageSize,
         current, setCurrent, total } = props
 
-    const [campusDetail, setCampusDetail] = useState(null)
-    const [isDetailOpen, setIsDetailOpen] = useState(false)
-    const [dataUpdate, setDataUpdate] = useState(null)
-    const [isUpdateFormOpen, setIsUpdateFormOpen] = useState(false)
-
-    const openNotificationWithIcon = (type, message, description) => {
-        api[type]({
-            message: message,
-            description: description
-        });
+    const formatterNumber = (val) => {
+        if (!val) return "0";
+        return Number(val).toLocaleString("en-US");
     };
-
-    const handleDeleteStudent = async (id) => {
-        const res = await deleteCampusAPI(id)
-        if (res.data) {
-            openNotificationWithIcon('success', 'Thành công', 'Xoá cơ sở thành công')
-            await loadStudentFee()
-        } else {
-            openNotificationWithIcon('error', 'Thất bại', JSON.stringify(res.message))
-        }
-    }
 
     const columns = [
         {
@@ -43,55 +20,76 @@ const StudentFeeTable = (props) => {
                         {(index + 1) + (current - 1) * 10}
                     </span>
                 )
+            },
+            width: "10%"
+        },
+        {
+            title: 'Họ và tên',
+            render: (_, record) => {
+                return (
+                    <span>
+                        {record.student.name}
+                    </span>
+                )
+            },
+            width: "25%"
+        },
+        {
+            title: 'Tháng',
+            render: (_, record) => {
+                return (
+                    <span>
+                        {record.month}
+                    </span>
+                )
+            },
+            width: "10%"
+        },
+        {
+            title: 'Số buổi học',
+            render: (_, record) => {
+                return (
+                    record.feeOfEachClass.length === 1 ? (
+                        <Tag>
+                            {record.totalAttendedDay}/{record.totalDay}
+                        </Tag>
+                    ) : (
+                        record.feeOfEachClass.map(item => (
+                            <Tag>{item.className}: {item.classAttendedDay}/{item.classTotalDay}</Tag>
+                        ))
+                    )
+                )
+            },
+            width: "25%"
+        },
+        {
+            title: 'Học phí (đồng)',
+            render: (_, record) => {
+                return (
+                    record.feeOfEachClass.length === 1 ? (
+                        <Tag>
+                            {formatterNumber(record.totalFee)}
+                        </Tag>
+                    ) : (
+                        record.feeOfEachClass.map(item => (
+                            <Tag>{item.className}: {formatterNumber(item.fee)}</Tag>
+                        ))
+                    )
+                )
             }
-        },
-        {
-            title: 'Cơ sở',
-            dataIndex: 'name',
-        },
-        {
-            title: 'Địa chỉ',
-            dataIndex: 'address',
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, record) => ( //record là bản ghi (record tương ứng với dòng dữ liệu)
-                <div style={{ display: "flex", gap: "20px" }}>
-                    <EditOutlined style={{ cursor: "pointer", color: "orange" }}
-                        onClick={() => {
-                            setIsUpdateFormOpen(true)
-                            setDataUpdate(record)
-                        }} />
-
-                    <Popconfirm
-                        title="Xoá cơ sở"
-                        description="Bạn chắc chắn xoá cơ sở này?"
-                        onConfirm={() => handleDeleteStudent(record.id)}
-                        okText="Yes"
-                        cancelText="No"
-                        placement='left'
-                    >
-                        <DeleteOutlined style={{ cursor: "pointer", color: "red" }} />
-                    </Popconfirm>
-                </div>
-            ),
         },
     ];
 
-    const onChange = (pagination, filters, sorter, extra) => { //các tham số trên antd cung cấp sẵn
-        //setCurrent, setPageSize
-        //nếu thay đổi trang: current
+    const onChange = (pagination, filters, sorter, extra) => {
         if (pagination && pagination.current) {
             if (+pagination.current !== +current) {
-                setCurrent(+pagination.current) //convert về number
+                setCurrent(+pagination.current)
             }
         }
 
-        //nếu thay đổi tổng số phần tử: pageSize
         if (pagination && pagination.pageSize) {
             if (+pagination.pageSize !== +pageSize) {
-                setPageSize(+pagination.pageSize) //convert về number
+                setPageSize(+pagination.pageSize)
             }
         }
     };
@@ -99,8 +97,6 @@ const StudentFeeTable = (props) => {
 
     return (
         <>
-            {contextHolder}
-
             <Row style={{ margin: "1%" }}>
                 <Col xs={24} style={{ width: "100vw" }}>
                     <Table
